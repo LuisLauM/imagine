@@ -30,9 +30,9 @@ myMatrix[index] <- NA
 
 # Build kernel
 radius <- 3
-kernel <- matrix(c(2, 1, 2,
-                   1, 1, 1,
-                   2, 1, 2), nrow = 3)
+kernel <- matrix(c(2, 1, 2, 1, 2,
+                   1, 1, 1, 1, 1,
+                   2, 1, 2, 2, 1), nrow = 3)
 
 # Make convolution
 myOutput <- convolution2D(myMatrix, kernel, times = 3)

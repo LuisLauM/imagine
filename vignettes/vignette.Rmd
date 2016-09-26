@@ -1,0 +1,236 @@
+---
+title: "Vignette for imagine package"
+author: "Wencheng Lau-Medrano"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{imagine}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE}
+library(imagine)
+```
+
+# imagine
+
+**Imaging Engine, Tools for Application of Image Filters to Data Matrices**
+
+This package was built to take numeric data matrices and apply image-filtering algoriths.
+
+Algoriths used by `imagine` include median-filter and 2D-convolution based algoriths implemented on Rcpp (C++) because sometimes the applicaion of this filters to large numeric matrices is very intensive and time expensive.
+
+
+## Installation
+
+For installing `imagine`, as follows:
+
+```{r, eval=FALSE}
+install.packages("imagine")
+```
+
+## Engines
+`imagine` performs algorithms written in Rcpp (called 'engines'), ensuring a faster application of filters. At version 1.0.0, `imagine` include two main engines, described as follows:
+
+### Engine 1
+```{Rcpp}
+#include <Rcpp.h>
+#include <algorithm>
+#include <math.h>
+
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
+  double nrows = data.nrow();
+  double ncols = data.ncol();
+
+  double knlrows = kernel.nrow();
+  double knlcols = kernel.ncol();
+
+  NumericMatrix emptyData(nrows, ncols);
+
+  for(double j = 0; j < ncols; j++){
+    for(double i = 0; i < nrows; i++){
+
+      double cumSum = 0;
+      double k = 0;
+
+      for(double n = 0; n < knlcols; n++){
+        for(double m = 0; m < knlrows; m++){
+          double a = i + m - 1;
+          double b = j + n - 1;
+
+          // Multiply the value of each cell by the corresponding value of the kernel.
+          if(!std::isnan(data(a, b))){
+            cumSum += data(a, b)*kernel(m, n);
+            k += kernel(m, n);
+          }
+
+        }
+      }
+
+      // If all values in neighborhood were NA, returns NA for this cell
+      if(k < 1){
+        emptyData(i, j) = NA_REAL;
+      }else{
+        emptyData(i, j) = cumSum/k;
+      }
+
+    }
+  }
+
+  return emptyData;
+}
+
+```
+
+### Engine 2
+```{Rcpp}
+#include <Rcpp.h>
+#include <algorithm>
+#include <math.h>
+
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
+  double nrows = data.nrow();
+  double ncols = data.ncol();
+
+  double knlrows = kernel.nrow();
+  double knlcols = kernel.ncol();
+
+  NumericMatrix emptyData(nrows, ncols);
+  NumericVector miniMatrix(knlrows*knlcols);
+
+  for(double j = 0; j < ncols; j++){
+    for(double i = 0; i < nrows; i++){
+      for(double n = 0; n < knlcols; n++){
+        for(double m = 0; m < knlrows; m++){
+          double index = m*knlrows + n;
+          double a = i + m - 1;
+          double b = j + n - 1;
+
+          miniMatrix[index] = data(a, b);
+        }
+      }
+
+      // Sort values 
+      std::sort(miniMatrix.begin(), miniMatrix.end());
+
+      // Get value for position indicated by 'x'
+      emptyData(i, j) = miniMatrix[x];
+    }
+  }
+
+  return emptyData;
+}
+
+```
+
+## Main functions
+
+There are 3 main version at version 1.0.0, described as follows:
+
+```{r, cache=TRUE}
+# Generate example matrix
+nRows <- 100
+nCols <- 200
+
+myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
+
+# Add some NA random values
+index <- sample(x = seq(nRows*nCols), size = as.integer(nRows*nCols*0.2), replace = FALSE)
+myMatrix[index] <- NA
+
+# Build kernel
+radius <- 3
+kernel <- matrix(c(2, 1, 2,
+                   1, 1, 1,
+                   2, 1, 2), nrow = 3)
+
+# Apply filters
+convolutionExample <- convolution2D(dataMatrix = myMatrix, kernel = kernel)
+meanFilterExample <- meanFilter2D(dataMatrix = myMatrix, radius = radius)
+medianFilterExample <- medianFilter2D(dataMatrix = myMatrix, radius = radius)
+
+```
+
+For compare results, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
+
+**Original**
+
+```{r, message=FALSE, fig.height=3, fig.width=3, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
+par(mar = rep(0, 4))
+image(myMatrix, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3))
+```
+
+
+**Filtered**
+
+```{r, message=FALSE, fig.height=2.85, fig.width=7.5, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE}
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(1, 3))
+image(convolutionExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
+mtext(text = "2D convolution", side = 3, line = 0.5)
+
+image(meanFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
+mtext(text = "2D mean filter", side = 3, line = 0.5)
+
+image(medianFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
+mtext(text = "2D median filter", side = 3, line = 0.5)
+```
+
+
+As we can see, `NA` in borders are not well filtered. Also, the function will try to use only the values with valid information. 
+
+## Kernel application
+The larger the radius, more pixels remain unanalyzed at the edges. In addition, `kernel` argument of `convolution2D` is a matrix, but unlike the `meanFilter2D` and `meanFilter2D` functions, it should not necessarily have square dimensions. So, if the user specifies a rectangular kernel, the function will use the neighborhood as the Figure 3 shows. 
+
+```{r, message=FALSE, fig.height=2, fig.width=5.7, fig.cap = "Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application", results='hide', fig.pos="h", echo=FALSE}
+par(mar = rep(0, 4), mfrow = c(1, 3), xaxs = "i", yaxs = "i")
+
+xlim <- c(-0.15, 1.1)
+ylim <- c(-0.01, 1.3)
+
+plotKernels <- function(dim1 = 3, dim2 = 3, showArrows = FALSE){
+  plot(1, 1, pch = NA, axes = FALSE, xlim = xlim, ylim = ylim, xlab = NA, ylab = NA)
+  polygon(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
+  
+  delay1 <- ifelse(dim1 %% 2 != 0, 0, 1/(2*dim1))
+  delay2 <- ifelse(dim2 %% 2 != 0, 0, 1/(2*dim2))
+  
+  mtext(text = paste0(dim1, "x", dim2, " kernel"), side = 3, line = -2)
+  
+  for(i in seq(dim1 - 1)){
+    lines(c(0, 1), 1 - rep(i/dim1, 2))
+  }
+  
+  for(i in seq(dim2 - 1)){
+    lines(rep(i/dim2, 2), c(0, 1))
+  }
+  
+  # abline(h = seq(0, 1, length.out = dim1 + 1))
+  # abline(v = seq(0, 1, length.out = dim2 + 1))
+  
+  if(isTRUE(showArrows)){
+    arrows(x0 = -0.05, y0 = 1.05, x1 = -0.05, y1 = 0.8, length = 0.1)
+    arrows(x0 = -0.05, y0 = 1.05, x1 = 0.25, y1 = 1.05, length = 0.1)
+  }
+  
+  points(0.5 - delay2, 0.5 + delay1, pch = 16)
+}
+
+# 3x3 kernel
+plotKernels(3, 3, showArrows = TRUE)
+
+# 3x4 kernel
+plotKernels(3, 4)
+
+# 4x5 kernel
+plotKernels(4, 5)
+```
+
+
+

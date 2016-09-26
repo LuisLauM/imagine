@@ -20,6 +20,9 @@ It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 }
+\details{
+This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+}
 \examples{
 # Generate example matrix
 nRows <- 10

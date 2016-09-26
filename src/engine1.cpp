@@ -34,21 +34,21 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
           double a = i + m - 1;
           double b = j + n - 1;
 
+          // Multiply the value of each cell by the corresponding value of the kernel.
           if(!std::isnan(data(a, b))){
             cumSum += data(a, b)*kernel(m, n);
             k += kernel(m, n);
           }
 
-
         }
       }
 
+      // If all values were NA, returns NA for this cell
       if(k < 1){
         emptyData(i, j) = NA_REAL;
       }else{
         emptyData(i, j) = cumSum/k;
       }
-
 
     }
   }

@@ -35,3 +35,10 @@ vignettes/*.pdf
 /src/*.o
 /src/*.dll
 /src/RcppExports.cpp
+/vignettes/vignette_cache/html/__packages
+/vignettes/vignette_cache/html/unnamed-chunk-5_816e8ec7314d556ffe77cd9db365058d.RData
+/vignettes/vignette_cache/html/unnamed-chunk-5_816e8ec7314d556ffe77cd9db365058d.rdb
+/vignettes/vignette_cache/html/unnamed-chunk-5_816e8ec7314d556ffe77cd9db365058d.rdx
+/vignettes/vignette_files/figure-html/unnamed-chunk-6-1.png
+/vignettes/vignette_files/figure-html/unnamed-chunk-7-1.png
+/vignettes/vignette_files/figure-html/unnamed-chunk-8-1.png

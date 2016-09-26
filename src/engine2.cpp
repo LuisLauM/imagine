@@ -36,8 +36,10 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
         }
       }
 
+      // Sort values
       std::sort(miniMatrix.begin(), miniMatrix.end());
 
+      // Get value for position indicated by 'x'
       emptyData(i, j) = miniMatrix[x];
     }
   }

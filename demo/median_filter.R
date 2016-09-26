@@ -1,8 +1,8 @@
 # Median filter --------------------------------------------------------------------------
 
 # Generate example matrix
-nRows <- 100
-nCols <- 200
+nRows <- 1000
+nCols <- 2000
 
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 radius <- 3

@@ -21,6 +21,9 @@ This function takes a \code{matrix} object, and for each cell multiplies its nei
 the squared matrix of dimension \eqn{radius*radius}. Finally, it returns for each cell the median of the
 weighted sum.
 }
+\details{
+This function uses the \code{engine2} C++ algorithm. More details are shown in vignette.
+}
 \examples{
 # Generate example matrix
 nRows <- 10

@@ -5,6 +5,7 @@
 #' @author Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
 #' @name image-package
 #' @description Package for faster application of image filters to data matrices, using R and C++ algorithms.
+#' @details This package uses C++ algorithms called 'engines'. More details are shown in vignette.
 #' @aliases imagine-package imagine
 #' @docType package
 #' @keywords image-matrix, image-filter
@@ -20,6 +21,8 @@ NULL
 #' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 #'
 #' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#'
+#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
 #' @export
 #'
 #' @examples
@@ -63,6 +66,8 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
 #' weighted sum.
 #'
 #' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#'
+#' @details This function uses the \code{engine2} C++ algorithm. More details are shown in vignette.
 #' @export
 #'
 #' @examples
@@ -106,6 +111,8 @@ medianFilter2D <- function(dataMatrix, radius, times = 1){
 #' weighted sum.
 #'
 #' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#'
+#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
 #' @export
 #'
 #' @examples
