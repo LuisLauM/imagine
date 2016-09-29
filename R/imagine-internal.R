@@ -1,20 +1,22 @@
 convolution2D_internal <- function(dataMatrix, kernel){
 
-
-  sumKernel <- sum(an(kernel))
-
   newData <- engine1(data = dataMatrix, kernel = kernel)
+
+  return(newData)
+}
+
+convolutionMean_internal <- function(dataMatrix, kernel, x){
+
+  newData <- engine1(data = dataMatrix, kernel = kernel, x)
 
   return(newData)
 }
 
 medianFilter2D_internal <- function(dataMatrix, radius){
 
-  kernel <- matrix(data = 1, nrow = radius, ncol = radius)
-
   x <- ceiling(0.5*prod(dim(kernel)))
 
-  newData <- engine2(data = dataMatrix, kernel = kernel, x = x)
+  newData <- engine2(data = dataMatrix, radius = radius, x = x)
 
   return(newData)
 }

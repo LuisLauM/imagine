@@ -55,6 +55,39 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
   return(output)
 }
 
+#' @title Make convolution calculation from numeric matrix
+#'
+#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
+#' @param kernel A little matrix used as mask for each cell of \code{dataMatrix}.
+#' @param times How many times do you want to apply the filter?
+#' @param x
+#'
+#' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
+#' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
+#'
+#' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#'
+#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+#' @export
+#'
+#' @examples
+#' # Generate example matrix
+#' nRows <- 10
+#' nCols <- 20
+#'
+#' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
+#' kernel <- diag(3)
+#'
+#' # Make convolution
+#' myOutput <- convolution2D(myMatrix, kernel)
+#'
+#' # Plot results
+#' image(myMatrix, zlim = c(0, 100))
+#' image(myOutput, zlim = c(0, 100))
+convolutionMean <- function(dataMatrix, kernel, x, times){
+
+}
+
 #' @title Make a 2D median filter calculation from numeric matrix
 #'
 #' @param dataMatrix A \code{numeric matrix} object used for apply filters.

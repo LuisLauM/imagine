@@ -186,6 +186,9 @@ mtext(text = "2D median filter", side = 3, line = 0.5)
 As we can see, `NA` in borders are not well filtered. Also, the function will try to use only the values with valid information. 
 
 ## Kernel application
+
+In the field of image processing, one of the tools most commonly used are the **convolutions**, which consist of operations between two arrays: The array of image data and small matrices, called kernels, which weights each pixel values with its corresponding neighborhood. Different kernels produce different effects, for instance blur, shifted images (right, left, up or down), sharpening, etc.
+
 The larger the radius, more pixels remain unanalyzed at the edges. In addition, `kernel` argument of `convolution2D` is a matrix, but unlike the `meanFilter2D` and `meanFilter2D` functions, it should not necessarily have square dimensions. So, if the user specifies a rectangular kernel, the function will use the neighborhood as the Figure 3 shows. 
 
 ```{r, message=FALSE, fig.height=2, fig.width=5.7, fig.cap = "Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application", results='hide', fig.pos="h", echo=FALSE}

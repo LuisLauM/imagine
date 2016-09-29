@@ -9,7 +9,7 @@ engine1 <- function(data, kernel) {
 
 #' @importFrom Rcpp evalCpp
 #' @useDynLib imagine
-engine2 <- function(data, kernel, x) {
-    .Call('imagine_engine2', PACKAGE = 'imagine', data, kernel, x)
+engine2 <- function(data, radius, x) {
+    .Call('imagine_engine2', PACKAGE = 'imagine', data, radius, x)
 }
 
