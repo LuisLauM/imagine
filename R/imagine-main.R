@@ -11,10 +11,13 @@
 #' @keywords image-matrix, image-filter
 NULL
 
-#' @title Make convolution calculation from numeric matrix
+#' @title Make convolution calculations from numeric matrix
+#'
+#' @rdname convolutions
 #'
 #' @param dataMatrix A \code{numeric matrix} object used for apply filters.
 #' @param kernel A little matrix used as mask for each cell of \code{dataMatrix}.
+#' @param x \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #'
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
@@ -34,20 +37,26 @@ NULL
 #' kernel <- diag(3)
 #'
 #' # Make convolution
-#' myOutput <- convolution2D(myMatrix, kernel)
+#' myOutput1 <- convolution2D(myMatrix, kernel)
+#' myOutput2 <- convolutionMean(myMatrix, kernel)
+#' myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 #'
 #' # Plot results
+#' par(mfrow = c(2, 2))
 #' image(myMatrix, zlim = c(0, 100))
-#' image(myOutput, zlim = c(0, 100))
+#' image(myOutput1, zlim = c(0, 100))
+#' image(myOutput2, zlim = c(0, 100))
+#' image(myOutput3, zlim = c(0, 100))
 convolution2D <- function(dataMatrix, kernel, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix, kernel, times)
-  checkedArgs <- checkArgs(checkedArgs, type = "convolution2D")
+  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
 
   # Apply filters
-  output <- dataMatrix
+  output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc()
     output <- with(checkedArgs,
                    convolution2D_internal(dataMatrix = output, kernel = kernel))
   }
@@ -55,43 +64,66 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
   return(output)
 }
 
-#' @title Make convolution calculation from numeric matrix
-#'
-#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
-#' @param kernel A little matrix used as mask for each cell of \code{dataMatrix}.
-#' @param times How many times do you want to apply the filter?
-#' @param x
-#'
-#' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-#' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
-#'
-#' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
-#'
-#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+#' @rdname convolutions
+#' @return \code{convolutionMean} uses the kernel but, for each cell, it returns the average.
 #' @export
-#'
-#' @examples
-#' # Generate example matrix
-#' nRows <- 10
-#' nCols <- 20
-#'
-#' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
-#' kernel <- diag(3)
-#'
-#' # Make convolution
-#' myOutput <- convolution2D(myMatrix, kernel)
-#'
-#' # Plot results
-#' image(myMatrix, zlim = c(0, 100))
-#' image(myOutput, zlim = c(0, 100))
-convolutionMean <- function(dataMatrix, kernel, x, times){
+convolutionMean <- function(dataMatrix, kernel, times = 1){
 
+  # Check and validation of arguments
+  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+
+  # Apply filters
+  output <- checkedArgs$dataMatrix
+  for(i in seq(times)){
+    gc()
+    output <- with(checkedArgs,
+                   convolutionMean_internal(dataMatrix = output, kernel = kernel))
+  }
+
+  return(output)
 }
+
+#' @rdname convolutions
+#' @return \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
+#' of quantile 'x' (value between 0 and 1).
+#' @export
+convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
+
+  # Check and validation of arguments
+  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, x = x, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+
+  # Apply filters
+  output <- checkedArgs$dataMatrix
+  for(i in seq(times)){
+    gc()
+    output <- with(checkedArgs,
+                   convolutionQuantile_internal(dataMatrix = output, kernel = kernel, x = x))
+  }
+
+  return(output)
+}
+
+
+#' @rdname convolutions
+#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5
+#' @export
+convolutionMedian <- function(dataMatrix, kernel, times = 1){
+
+  output <- convolutionQuantile(dataMatrix = dataMatrix, kernel = kernel, x = 0.5, times = times)
+
+  return(output)
+}
+
 
 #' @title Make a 2D median filter calculation from numeric matrix
 #'
+#' @rdname medianFilter2D
+#'
 #' @param dataMatrix A \code{numeric matrix} object used for apply filters.
 #' @param radius Size of squared kernel to apply median.
+#' @param x \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #'
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
@@ -112,68 +144,72 @@ convolutionMean <- function(dataMatrix, kernel, x, times){
 #' radius <- 3
 #'
 #' # Make convolution
-#' myOutput <- medianFilter2D(myMatrix, radius)
+#' myOutput1 <- meanFilter(myMatrix, radius)
+#' myOutput2 <- quantileFilter(myMatrix, radius, 0.1)
+#' myOutput3 <- medianFilter(myMatrix, radius)
 #'
 #' # Plot results
 #' image(myMatrix, zlim = c(0, 100))
-#' image(myOutput, zlim = c(0, 100))
-medianFilter2D <- function(dataMatrix, radius, times = 1){
+#' image(myOutput1, zlim = c(0, 100))
+#' image(myOutput2, zlim = c(0, 100))
+#' image(myOutput3, zlim = c(0, 100))
+meanFilter <- function(dataMatrix, radius, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix, radius, times)
-  checkedArgs <- checkArgs(checkedArgs, type = "medianFilter2D")
+  checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
 
   # Apply filters
-  output <- dataMatrix
+  output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc()
     output <- with(checkedArgs,
-                   medianFilter2D_internal(dataMatrix = output, radius = radius))
+                   meanFilter_internal(dataMatrix = output, radius = radius))
   }
 
   return(output)
 }
 
-#' @title Make 2D mean filter calculation from numeric matrix
-#'
-#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
-#' @param radius Size of squared kernel to apply mean.
-#' @param times How many times do you want to apply the filter?
-#'
-#' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-#' the squared matrix of dimension \eqn{radius*radius}. Finally, it returns for each cell the mean of the
-#' weighted sum.
-#'
-#' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
-#'
-#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+
+#' @rdname medianFilter2D
+#' @return \code{quantileFilter} uses the kernel but, for each cell, it returns the position
+#' of quantile 'x' (value between 0 and 1).
 #' @export
-#'
-#' @examples
-#' # Generate example matrix
-#' nRows <- 10
-#' nCols <- 20
-#'
-#' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
-#' radius <- 3
-#'
-#' # Make convolution
-#' myOutput <- meanFilter2D(myMatrix, radius)
-#'
-#' # Plot results
-#' image(myMatrix, zlim = c(0, 100))
-#' image(myOutput, zlim = c(0, 100))
-meanFilter2D <- function(dataMatrix, radius, times = 1){
+quantileFilter <- function(dataMatrix, radius, x, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix, radius, times)
-  checkedArgs <- checkArgs(checkedArgs, type = "meanFilter2D")
+  checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, x = x, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
 
   # Apply filters
-  output <- dataMatrix
+  output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc()
     output <- with(checkedArgs,
-                   meanFilter2D_internal(dataMatrix = output, radius = radius))
+                   quantileFilter_internal(dataMatrix = output, radius = radius, x = x))
   }
 
   return(output)
 }
+
+
+#' @rdname medianFilter2D
+#' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5
+#' @export
+medianFilter <- function(dataMatrix, radius, times = 1){
+
+  output <- quantileFilter(dataMatrix = dataMatrix, radius = radius, x = 0.5, times = times)
+
+  return(output)
+}
+
+
+#' @title Data matrix to be used as example image.
+#' @name wbImage
+#' @description \code{matrix} object containig numeric data to plot a image. The photo was taken
+#' by the author at 2016.
+#' @aliases wbImage
+#' @docType data
+#' @usage wbImage
+#' @format A \code{matrix} with dimnensions 1280x720.
+NULL

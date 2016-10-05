@@ -5,42 +5,78 @@ library(imagine)
 #  install.packages("imagine")
 
 ## ---- cache=TRUE---------------------------------------------------------
-# Generate example matrix
-nRows <- 100
-nCols <- 200
+myMatrix <- wbImage
 
-myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
+# Build kernels
+# Kernel 1: For bottom edge recognition
+kernel1 <- matrix(c(-1, -2, -1,
+                     0,  0,  0,
+                     1,  2,  1), nrow = 3)
 
-# Add some NA random values
-index <- sample(x = seq(nRows*nCols), size = as.integer(nRows*nCols*0.2), replace = FALSE)
-myMatrix[index] <- NA
+# Kernel 2: Diagonal weighting
+kernel2 <- matrix(c(1, 0, 1,
+                    0, 2, 0,
+                    1, 0, 1), nrow = 3)
+
+# Apply filters
+convolutionExample  <- convolution2D(dataMatrix = myMatrix, kernel = kernel1)
+convMeanExample     <- convolutionMean(dataMatrix = myMatrix, kernel = kernel2)
+convQuantileExample <- convolutionQuantile(dataMatrix = myMatrix, kernel = kernel2, x = 0.7)
+
+
+## ---- message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
+par(mar = rep(0, 4))
+cols <- colorRampPalette(colors = c("black", "white"))(1e4)
+
+image(myMatrix, col = cols)
+
+## ---- message=FALSE, fig.height=9, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE----
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
+
+convolutionExample[convolutionExample < 0] <- 0
+image(convolutionExample, col = cols, axes = FALSE)
+mtext(text = "2D convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+convMeanExample[convMeanExample < 0] <- 0
+image(convMeanExample, col = cols, axes = FALSE)
+mtext(text = "2D mean convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+convQuantileExample[convQuantileExample < 0] <- 0
+image(convQuantileExample, col = cols, axes = FALSE)
+mtext(text = "2D median convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+## ---- cache=TRUE---------------------------------------------------------
+# # Add some noise (NA) to the image (matrix)
+# naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
+# myMatrix[naIndex] <- NA
 
 # Build kernel
 radius <- 3
-kernel <- matrix(c(2, 1, 2,
-                   1, 1, 1,
-                   2, 1, 2), nrow = 3)
 
 # Apply filters
-convolutionExample <- convolution2D(dataMatrix = myMatrix, kernel = kernel)
-meanFilterExample <- meanFilter2D(dataMatrix = myMatrix, radius = radius)
-medianFilterExample <- medianFilter2D(dataMatrix = myMatrix, radius = radius)
+meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
+quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
+medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius)
 
 
-## ---- message=FALSE, fig.height=3, fig.width=3, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
+## ---- message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
 par(mar = rep(0, 4))
-image(myMatrix, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3))
+image(myMatrix, col = cols)
 
-## ---- message=FALSE, fig.height=2.85, fig.width=7.5, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE----
-par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(1, 3))
-image(convolutionExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D convolution", side = 3, line = 0.5)
+## ---- message=FALSE, fig.height=9, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE----
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
 
-image(meanFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D mean filter", side = 3, line = 0.5)
+meanfilterExample[meanfilterExample < 0] <- 0
+image(meanfilterExample, col = cols, axes = FALSE)
+mtext(text = "Mean filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
-image(medianFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D median filter", side = 3, line = 0.5)
+quantilefilterExample[quantilefilterExample < 0] <- 0
+image(quantilefilterExample, col = cols, axes = FALSE)
+mtext(text = "Quantile filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+medianfilterExample[medianfilterExample < 0] <- 0
+image(medianfilterExample, col = cols, axes = FALSE)
+mtext(text = "2D median filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
 ## ---- message=FALSE, fig.height=2, fig.width=5.7, fig.cap = "Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application", results='hide', fig.pos="h", echo=FALSE----
 par(mar = rep(0, 4), mfrow = c(1, 3), xaxs = "i", yaxs = "i")

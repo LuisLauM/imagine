@@ -2,7 +2,10 @@
 
 export(convolution2D)
 export(convolutionMean)
-export(meanFilter2D)
-export(medianFilter2D)
+export(convolutionMedian)
+export(convolutionQuantile)
+export(meanFilter)
+export(medianFilter)
+export(quantileFilter)
 importFrom(Rcpp,evalCpp)
 useDynLib(imagine)

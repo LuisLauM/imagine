@@ -11,11 +11,17 @@ kernel <- matrix(c(2, 1, 2,
                    2, 1, 2), nrow = 3)
 
 # Make convolution
-myOutput <- convolution2D(myMatrix, kernel)
+myOutput1 <- convolution2D(myMatrix, kernel)
+myOutput2 <- convolutionMean(myMatrix, kernel)
+myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
-image(myMatrix, zlim = c(0, 100), col = colorRampPalette(c("red", "blue"))(1e3))
-image(myOutput, zlim = c(0, 100), col = colorRampPalette(c("red", "blue"))(1e3))
+cols = colorRampPalette(c("red", "blue"))(1e3)
+par(mfrow = c(2, 2))
+image(myMatrix, zlim = c(0, 100), col = cols)
+image(myOutput1, zlim = c(0, 100), col = cols)
+image(myOutput2, zlim = c(0, 100), col = cols)
+image(myOutput3, zlim = c(0, 100), col = cols)
 
 ####### Second example: A data matrix with NA values #######
 # Generate example matrix
@@ -35,8 +41,14 @@ kernel <- matrix(c(2, 1, 2, 1, 2,
                    2, 1, 2, 2, 1), nrow = 3)
 
 # Make convolution
-myOutput <- convolution2D(myMatrix, kernel, times = 3)
+myOutput1 <- convolution2D(myMatrix, kernel)
+myOutput2 <- convolutionMean(myMatrix, kernel)
+myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
-image(myMatrix, zlim = c(0, 100), col = colorRampPalette(c("red", "blue"))(1e3))
-image(myOutput, zlim = c(0, 100), col = colorRampPalette(c("red", "blue"))(1e3))
+cols = colorRampPalette(c("red", "blue"))(1e3)
+par(mfrow = c(2, 2))
+image(myMatrix, zlim = c(0, 100), col = cols)
+image(myOutput1, zlim = c(0, 100), col = cols)
+image(myOutput2, zlim = c(0, 100), col = cols)
+image(myOutput3, zlim = c(0, 100), col = cols)

@@ -7,15 +7,9 @@ using namespace Rcpp;
 //' @importFrom Rcpp evalCpp
 //' @useDynLib imagine
 // [[Rcpp::export]]
-NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
-
-  // Engine 2: Convolution mean
-
+NumericMatrix engine4(NumericMatrix data, int radius){
   int nrows = data.nrow();
   int ncols = data.ncol();
-
-  int knlrows = kernel.nrow();
-  int knlcols = kernel.ncol();
 
   NumericMatrix emptyData(nrows, ncols);
 
@@ -25,27 +19,24 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
       double cumSum = 0;
       int k = 0;
 
-      for(int n = 0; n < knlcols; n++){
-        for(int m = 0; m < knlrows; m++){
+      for(int n = 0; n < radius; n++){
+        for(int m = 0; m < radius; m++){
+
           int a = i + m - 1;
           int b = j + n - 1;
 
-          // Multiply the value of each cell by the corresponding value of the kernel.
           if(!std::isnan(data(a, b))){
-            cumSum += data(a, b)*kernel(m, n);
-            k += kernel(m, n);
+            cumSum += data(a, b);
+            k++;
           }
-
         }
       }
 
-      // If all values were NA, returns NA for this cell
       if(k < 1){
         emptyData(i, j) = NA_REAL;
       }else{
         emptyData(i, j) = cumSum/k;
       }
-
     }
   }
 

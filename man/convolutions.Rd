@@ -2,9 +2,18 @@
 % Please edit documentation in R/imagine-main.R
 \name{convolution2D}
 \alias{convolution2D}
-\title{Make convolution calculation from numeric matrix}
+\alias{convolutionMean}
+\alias{convolutionMedian}
+\alias{convolutionQuantile}
+\title{Make convolution calculations from numeric matrix}
 \usage{
 convolution2D(dataMatrix, kernel, times = 1)
+
+convolutionMean(dataMatrix, kernel, times = 1)
+
+convolutionQuantile(dataMatrix, kernel, x, times = 1)
+
+convolutionMedian(dataMatrix, kernel, times = 1)
 }
 \arguments{
 \item{dataMatrix}{A \code{numeric matrix} object used for apply filters.}
@@ -12,9 +21,18 @@ convolution2D(dataMatrix, kernel, times = 1)
 \item{kernel}{A little matrix used as mask for each cell of \code{dataMatrix}.}
 
 \item{times}{How many times do you want to apply the filter?}
+
+\item{x}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
 It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+
+\code{convolutionMean} uses the kernel but, for each cell, it returns the average.
+
+\code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
+of quantile 'x' (value between 0 and 1).
+
+\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5
 }
 \description{
 This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
@@ -32,10 +50,15 @@ myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 kernel <- diag(3)
 
 # Make convolution
-myOutput <- convolution2D(myMatrix, kernel)
+myOutput1 <- convolution2D(myMatrix, kernel)
+myOutput2 <- convolutionMean(myMatrix, kernel)
+myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
+par(mfrow = c(2, 2))
 image(myMatrix, zlim = c(0, 100))
-image(myOutput, zlim = c(0, 100))
+image(myOutput1, zlim = c(0, 100))
+image(myOutput2, zlim = c(0, 100))
+image(myOutput3, zlim = c(0, 100))
 }
 

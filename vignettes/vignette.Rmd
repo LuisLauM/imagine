@@ -31,130 +31,37 @@ install.packages("imagine")
 ```
 
 ## Engines
-`imagine` performs algorithms written in Rcpp (called 'engines'), ensuring a faster application of filters. At version 1.0.0, `imagine` include two main engines, described as follows:
+`imagine` performs algorithms written in Rcpp (called 'engines'), ensuring a faster application of filters. At version 1.0.0, `imagine` include five main engines, described as follows:
 
-### Engine 1
-```{Rcpp}
-#include <Rcpp.h>
-#include <algorithm>
-#include <math.h>
-
-using namespace Rcpp;
-
-// [[Rcpp::export]]
-NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
-  double nrows = data.nrow();
-  double ncols = data.ncol();
-
-  double knlrows = kernel.nrow();
-  double knlcols = kernel.ncol();
-
-  NumericMatrix emptyData(nrows, ncols);
-
-  for(double j = 0; j < ncols; j++){
-    for(double i = 0; i < nrows; i++){
-
-      double cumSum = 0;
-      double k = 0;
-
-      for(double n = 0; n < knlcols; n++){
-        for(double m = 0; m < knlrows; m++){
-          double a = i + m - 1;
-          double b = j + n - 1;
-
-          // Multiply the value of each cell by the corresponding value of the kernel.
-          if(!std::isnan(data(a, b))){
-            cumSum += data(a, b)*kernel(m, n);
-            k += kernel(m, n);
-          }
-
-        }
-      }
-
-      // If all values in neighborhood were NA, returns NA for this cell
-      if(k < 1){
-        emptyData(i, j) = NA_REAL;
-      }else{
-        emptyData(i, j) = cumSum/k;
-      }
-
-    }
-  }
-
-  return emptyData;
-}
-
-```
-
-### Engine 2
-```{Rcpp}
-#include <Rcpp.h>
-#include <algorithm>
-#include <math.h>
-
-using namespace Rcpp;
-
-// [[Rcpp::export]]
-NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
-  double nrows = data.nrow();
-  double ncols = data.ncol();
-
-  double knlrows = kernel.nrow();
-  double knlcols = kernel.ncol();
-
-  NumericMatrix emptyData(nrows, ncols);
-  NumericVector miniMatrix(knlrows*knlcols);
-
-  for(double j = 0; j < ncols; j++){
-    for(double i = 0; i < nrows; i++){
-      for(double n = 0; n < knlcols; n++){
-        for(double m = 0; m < knlrows; m++){
-          double index = m*knlrows + n;
-          double a = i + m - 1;
-          double b = j + n - 1;
-
-          miniMatrix[index] = data(a, b);
-        }
-      }
-
-      // Sort values 
-      std::sort(miniMatrix.begin(), miniMatrix.end());
-
-      // Get value for position indicated by 'x'
-      emptyData(i, j) = miniMatrix[x];
-    }
-  }
-
-  return emptyData;
-}
-
-```
+* Engine 1: Basic convolution algorithm. Multiplies kernel by the neighborhood of each cell. Then, it sums all values.
+* Engine 2: Multiplies kernel by the neighborhood of each cell. Then, it returns the average of all values.
+* Engine 3: Multiplies kernel by the neighborhood of each cell. Then, it returns the position indicated by the parameter `x`.
+* Engine 4: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and calculates the mean.
+* Engine 5: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and returns the position indicated by the parameter `x`
 
 ## Main functions
 
-There are 3 main version at version 1.0.0, described as follows:
+There are 5 main functions and 2 wrappers at version 1.1.0, described as follows:
 
+### Convolution functions
 ```{r, cache=TRUE}
-# Generate example matrix
-nRows <- 100
-nCols <- 200
+myMatrix <- wbImage
 
-myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
+# Build kernels
+# Kernel 1: For bottom edge recognition
+kernel1 <- matrix(c(-1, -2, -1,
+                     0,  0,  0,
+                     1,  2,  1), nrow = 3)
 
-# Add some NA random values
-index <- sample(x = seq(nRows*nCols), size = as.integer(nRows*nCols*0.2), replace = FALSE)
-myMatrix[index] <- NA
-
-# Build kernel
-radius <- 3
-kernel <- matrix(c(2, 1, 2,
-                   1, 1, 1,
-                   2, 1, 2), nrow = 3)
+# Kernel 2: Diagonal weighting
+kernel2 <- matrix(c(1, 0, 1,
+                    0, 2, 0,
+                    1, 0, 1), nrow = 3)
 
 # Apply filters
-convolutionExample <- convolution2D(dataMatrix = myMatrix, kernel = kernel)
-meanFilterExample <- meanFilter2D(dataMatrix = myMatrix, radius = radius)
-medianFilterExample <- medianFilter2D(dataMatrix = myMatrix, radius = radius)
+convolutionExample  <- convolution2D(dataMatrix = myMatrix, kernel = kernel1)
+convMeanExample     <- convolutionMean(dataMatrix = myMatrix, kernel = kernel2)
+convQuantileExample <- convolutionQuantile(dataMatrix = myMatrix, kernel = kernel2, x = 0.7)
 
 ```
 
@@ -162,28 +69,76 @@ For compare results, we will plot both data (original and filtered) using `image
 
 **Original**
 
-```{r, message=FALSE, fig.height=3, fig.width=3, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
+```{r, message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
 par(mar = rep(0, 4))
-image(myMatrix, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3))
+cols <- colorRampPalette(colors = c("black", "white"))(1e4)
+
+image(myMatrix, col = cols)
 ```
 
 
 **Filtered**
 
-```{r, message=FALSE, fig.height=2.85, fig.width=7.5, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE}
-par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(1, 3))
-image(convolutionExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D convolution", side = 3, line = 0.5)
+```{r, message=FALSE, fig.height=9, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE}
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
 
-image(meanFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D mean filter", side = 3, line = 0.5)
+convolutionExample[convolutionExample < 0] <- 0
+image(convolutionExample, col = cols, axes = FALSE)
+mtext(text = "2D convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
-image(medianFilterExample, zlim = c(0, 100), col = colorRampPalette(c("red", "green"))(1e3), axes = FALSE)
-mtext(text = "2D median filter", side = 3, line = 0.5)
+convMeanExample[convMeanExample < 0] <- 0
+image(convMeanExample, col = cols, axes = FALSE)
+mtext(text = "2D mean convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+convQuantileExample[convQuantileExample < 0] <- 0
+image(convQuantileExample, col = cols, axes = FALSE)
+mtext(text = "2D median convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 ```
 
 
-As we can see, `NA` in borders are not well filtered. Also, the function will try to use only the values with valid information. 
+### Median-filter asociated functions
+```{r, cache=TRUE}
+# # Add some noise (NA) to the image (matrix)
+# naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
+# myMatrix[naIndex] <- NA
+
+# Build kernel
+radius <- 3
+
+# Apply filters
+meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
+quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
+medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius)
+
+```
+
+For compare results, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
+
+**Original**
+
+```{r, message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
+par(mar = rep(0, 4))
+image(myMatrix, col = cols)
+```
+
+
+**Filtered**
+
+```{r, message=FALSE, fig.height=9, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE}
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
+
+meanfilterExample[meanfilterExample < 0] <- 0
+image(meanfilterExample, col = cols, axes = FALSE)
+mtext(text = "Mean filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+quantilefilterExample[quantilefilterExample < 0] <- 0
+image(quantilefilterExample, col = cols, axes = FALSE)
+mtext(text = "Quantile filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+
+medianfilterExample[medianfilterExample < 0] <- 0
+image(medianfilterExample, col = cols, axes = FALSE)
+mtext(text = "2D median filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+```
 
 ## Kernel application
 

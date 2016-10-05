@@ -8,48 +8,34 @@ using namespace Rcpp;
 //' @useDynLib imagine
 // [[Rcpp::export]]
 NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
-  double nrows = data.nrow();
-  double ncols = data.ncol();
 
-  double knlrows = kernel.nrow();
-  double knlcols = kernel.ncol();
+  // Engine 1: Basic convolution
 
-  // double rowY = (knlrows - 1)/2;
-  // double colY = (knlcols - 1)/2;
-  //
-  // double rowZ = std::floor(rowY);
-  // double colZ = std::ceil(colY);
+  int nrows = data.nrow();
+  int ncols = data.ncol();
+
+  int knlrows = kernel.nrow();
+  int knlcols = kernel.ncol();
 
   NumericMatrix emptyData(nrows, ncols);
 
-  // for(double j = colZ - 1; j < ncols - colZ; j++){
-  for(double j = 0; j < ncols; j++){
-    for(double i = 0; i < nrows; i++){
+  for(int j = 0; j < ncols; j++){
+    for(int i = 0; i < nrows; i++){
 
       double cumSum = 0;
-      double k = 0;
 
-      for(double n = 0; n < knlcols; n++){
-        for(double m = 0; m < knlrows; m++){
-          double a = i + m - 1;
-          double b = j + n - 1;
+      for(int n = 0; n < knlcols; n++){
+        for(int m = 0; m < knlrows; m++){
+          int a = i + m - 1;
+          int b = j + n - 1;
 
           // Multiply the value of each cell by the corresponding value of the kernel.
-          if(!std::isnan(data(a, b))){
-            cumSum += data(a, b)*kernel(m, n);
-            k += kernel(m, n);
-          }
-
+          cumSum += data(a, b)*kernel(m, n);
         }
       }
 
-      // If all values were NA, returns NA for this cell
-      if(k < 1){
-        emptyData(i, j) = NA_REAL;
-      }else{
-        emptyData(i, j) = cumSum/k;
-      }
-
+      // Assign sum of values to corresponding cell
+      emptyData(i, j) = cumSum;
     }
   }
 
