@@ -31,7 +31,7 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
           int b = j + n - 1;
 
           // Multiply the value of each cell by the corresponding value of the kernel.
-          if(!std::isnan(data(a, b))){
+          if((a > 0) & (a < (nrows - 1)) & (b > 0) & (b < (ncols - 1)) & (!std::isnan(data(a, b)))){
             cumSum += data(a, b)*kernel(m, n);
             k += kernel(m, n);
           }

@@ -70,7 +70,7 @@ For compare results, we will plot both data (original and filtered) using `image
 **Original**
 
 ```{r, message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
-par(mar = rep(0, 4))
+par(mar = rep(0, 4), mfrow = c(1, 1))
 cols <- colorRampPalette(colors = c("black", "white"))(1e4)
 
 image(myMatrix, col = cols)
@@ -98,9 +98,12 @@ mtext(text = "2D median convolution", side = 1, line = -1.5, col = "white", font
 
 ### Median-filter asociated functions
 ```{r, cache=TRUE}
-# # Add some noise (NA) to the image (matrix)
-# naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
-# myMatrix[naIndex] <- NA
+rm(list = ls())
+myMatrix <- wbImage
+
+# Add some noise (NA) to the image (matrix)
+naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
+myMatrix[naIndex] <- NA
 
 # Build kernel
 radius <- 3
@@ -117,7 +120,7 @@ For compare results, we will plot both data (original and filtered) using `image
 **Original**
 
 ```{r, message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE}
-par(mar = rep(0, 4))
+par(mar = rep(0, 4), mfrow = c(1, 1))
 image(myMatrix, col = cols)
 ```
 

@@ -25,7 +25,7 @@ NumericMatrix engine4(NumericMatrix data, int radius){
           int a = i + m - 1;
           int b = j + n - 1;
 
-          if(!std::isnan(data(a, b))){
+          if((a > 0) & (a < (nrows - 1)) & (b > 0) & (b < (ncols - 1)) & (!std::isnan(data(a, b)))){
             cumSum += data(a, b);
             k++;
           }

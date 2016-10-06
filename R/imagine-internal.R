@@ -18,7 +18,7 @@ convolutionQuantile_internal <- function(dataMatrix, kernel, x){
   maxValue <- max(an(dataMatrix), na.rm = TRUE)*max(an(kernel), na.rm = TRUE)
 
   newData <- engine3(data = dataMatrix, kernel = kernel, x = x, maxValue = maxValue)
-  newData[newData > maxValue - 1] <- NA
+  newData[newData > (maxValue - 1)] <- NA
 
   return(newData)
 }
@@ -33,10 +33,10 @@ meanFilter_internal <- function(dataMatrix, radius){
 quantileFilter_internal <- function(dataMatrix, radius, x){
 
   x <- ceiling(x*radius^2) - 1
-  maxValue <- max(an(dataMatrix), na.rm = TRUE)
+  maxValue <- max(an(dataMatrix), na.rm = TRUE)*99
 
   newData <- engine5(data = dataMatrix, radius = radius, x = as.integer(x), maxValue = maxValue)
-  newData[newData > maxValue - 1] <- NA
+  newData[newData > (maxValue - 1)] <- NA
 
   return(newData)
 }

@@ -23,7 +23,7 @@ NumericMatrix engine5(NumericMatrix data, int radius, double x, double maxValue)
           int a = i + m - 1;
           int b = j + n - 1;
 
-          if((a < 0) | (a > nrows - 1) | (b < 0) | (b > ncols - 1) | (std::isnan(data(a, b)))){
+          if((a < 0) | (a > (nrows - 1)) | (b < 0) | (b > (ncols - 1)) | (std::isnan(data(a, b)))){
             miniMatrix[index] = maxValue;
           }else{
             miniMatrix[index] = data(a, b);
