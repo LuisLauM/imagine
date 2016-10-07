@@ -98,12 +98,11 @@ mtext(text = "2D median convolution", side = 1, line = -1.5, col = "white", font
 
 ### Median-filter asociated functions
 ```{r, cache=TRUE}
-rm(list = ls())
 myMatrix <- wbImage
 
-# Add some noise (NA) to the image (matrix)
-naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
-myMatrix[naIndex] <- NA
+# # Add some noise (NA) to the image (matrix)
+# naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
+# myMatrix[naIndex] <- NA
 
 # Build kernel
 radius <- 3

@@ -16,7 +16,7 @@ myOutput2 <- convolutionMean(myMatrix, kernel)
 myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
-cols = colorRampPalette(c("red", "blue"))(1e3)
+cols <- colorRampPalette(colors = c("black", "white"))(1e4)
 par(mfrow = c(2, 2))
 image(myMatrix, zlim = c(0, 100), col = cols)
 image(myOutput1, zlim = c(0, 100), col = cols)
@@ -46,7 +46,6 @@ myOutput2 <- convolutionMean(myMatrix, kernel)
 myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
-cols = colorRampPalette(c("red", "blue"))(1e3)
 par(mfrow = c(2, 2))
 image(myMatrix, zlim = c(0, 100), col = cols)
 image(myOutput1, zlim = c(0, 100), col = cols)
