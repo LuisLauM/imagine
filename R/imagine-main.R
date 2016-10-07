@@ -56,9 +56,9 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    gc()
     output <- with(checkedArgs,
                    convolution2D_internal(dataMatrix = output, kernel = kernel))
+    gc()
   }
 
   return(output)
@@ -76,9 +76,9 @@ convolutionMean <- function(dataMatrix, kernel, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    gc()
     output <- with(checkedArgs,
                    convolutionMean_internal(dataMatrix = output, kernel = kernel))
+    gc()
   }
 
   return(output)
@@ -97,9 +97,9 @@ convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    gc()
     output <- with(checkedArgs,
                    convolutionQuantile_internal(dataMatrix = output, kernel = kernel, x = x))
+    gc()
   }
 
   return(output)
@@ -162,9 +162,9 @@ meanFilter <- function(dataMatrix, radius, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    gc()
     output <- with(checkedArgs,
                    meanFilter_internal(dataMatrix = output, radius = radius))
+    gc()
   }
 
   return(output)
@@ -184,9 +184,9 @@ quantileFilter <- function(dataMatrix, radius, x, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    gc()
     output <- with(checkedArgs,
                    quantileFilter_internal(dataMatrix = output, radius = radius, x = x))
+    gc()
   }
 
   return(output)
