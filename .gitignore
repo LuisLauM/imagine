@@ -57,3 +57,7 @@ vignettes/*.pdf
 /vignettes/vignette_cache/html/unnamed-chunk-6_5b15f51452d942fa01cade927c0594d8.RData
 /vignettes/vignette_cache/html/unnamed-chunk-6_5b15f51452d942fa01cade927c0594d8.rdb
 /vignettes/vignette_cache/html/unnamed-chunk-6_5b15f51452d942fa01cade927c0594d8.rdx
+/README_files
+/README_files/figure-markdown_github/*.png
+/*.png
+/README_files/figure-markdown_github/*.png

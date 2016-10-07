@@ -1,8 +1,7 @@
 imagine
 =======
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html)
-
+<!-- [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html) -->
 **Imaging Engine, Tools for Application of Image Filters to Data Matrices**
 
 This package was built to take numeric data matrices and apply image-filtering algoriths.
@@ -63,4 +62,4 @@ image(newMatrix, col = cols, axes = FALSE)
 mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](README-unnamed-chunk-4-1.png)

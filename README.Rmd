@@ -16,7 +16,7 @@ library(imagine)
 
 # imagine
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html)
+<!-- [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html) -->
 
 **Imaging Engine, Tools for Application of Image Filters to Data Matrices**
 
