@@ -44,3 +44,11 @@ Done.
 >  mean_filter
 
 Done.
+
+
+## Second submission
+
+> Non-standard files/directories found at top level:
+>  ‘README-unnamed-chunk-4-1.png’ ‘README.Rmd’ ‘README_cache’
+
+Deleted.
