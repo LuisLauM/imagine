@@ -23,9 +23,11 @@ NULL
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 #' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 #'
-#' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 #'
-#' @details This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+#' @details Functions use the \code{engine1}, \code{engine2}, \code{engine3} C++ algorithms.
+#' More details are shown in vignette.
+#'
 #' @export
 #'
 #' @examples
@@ -56,9 +58,11 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc(reset = TRUE)
+
     output <- with(checkedArgs,
                    convolution2D_internal(dataMatrix = output, kernel = kernel))
-    gc()
+
   }
 
   return(output)
@@ -76,9 +80,11 @@ convolutionMean <- function(dataMatrix, kernel, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc(reset = TRUE)
+
     output <- with(checkedArgs,
                    convolutionMean_internal(dataMatrix = output, kernel = kernel))
-    gc()
+
   }
 
   return(output)
@@ -97,9 +103,11 @@ convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc(reset = TRUE)
+
     output <- with(checkedArgs,
                    convolutionQuantile_internal(dataMatrix = output, kernel = kernel, x = x))
-    gc()
+
   }
 
   return(output)
@@ -107,7 +115,7 @@ convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
 
 
 #' @rdname convolutions
-#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5
+#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5.
 #' @export
 convolutionMedian <- function(dataMatrix, kernel, times = 1){
 
@@ -117,22 +125,22 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 }
 
 
-#' @title Make a 2D median filter calculation from numeric matrix
+#' @title Make a 2D filter calculations from numeric matrix
 #'
-#' @rdname medianFilter2D
+#' @rdname basic2DFilter
 #'
 #' @param dataMatrix A \code{numeric matrix} object used for apply filters.
 #' @param radius Size of squared kernel to apply median.
 #' @param x \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #'
-#' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-#' the squared matrix of dimension \eqn{radius*radius}. Finally, it returns for each cell the median of the
-#' weighted sum.
+#' @description This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
+#' the squared matrix of dimension \eqn{radius*radius}. Finally and according to the type of function, they
+#' return for each cell the mean, median or the quantile of the weighted sum.
 #'
-#' @return It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 #'
-#' @details This function uses the \code{engine2} C++ algorithm. More details are shown in vignette.
+#' @details Functions use the \code{engine4} and \code{engine5} C++ algorithms. More details are shown in vignette.
 #' @export
 #'
 #' @examples
@@ -162,17 +170,19 @@ meanFilter <- function(dataMatrix, radius, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
+    gc(reset = TRUE)
+
     output <- with(checkedArgs,
                    meanFilter_internal(dataMatrix = output, radius = radius))
-    gc()
+
   }
 
   return(output)
 }
 
 
-#' @rdname medianFilter2D
-#' @return \code{quantileFilter} uses the kernel but, for each cell, it returns the position
+#' @rdname basic2DFilter
+#' @return \code{quantileFilter} don't use a kernel but, for each cell, it returns the position
 #' of quantile 'x' (value between 0 and 1).
 #' @export
 quantileFilter <- function(dataMatrix, radius, x, times = 1){
@@ -184,17 +194,18 @@ quantileFilter <- function(dataMatrix, radius, x, times = 1){
   # Apply filters
   output <- checkedArgs$dataMatrix
   for(i in seq(times)){
-    output <- with(checkedArgs,
-                   quantileFilter_internal(dataMatrix = output, radius = radius, x = x))
-    gc()
+
+    output <- quantileFilter_internal(dataMatrix = output, radius = checkedArgs$radius, x = checkedArgs$x)
+
+    gc(reset = TRUE)
   }
 
   return(output)
 }
 
 
-#' @rdname medianFilter2D
-#' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5
+#' @rdname basic2DFilter
+#' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5.
 #' @export
 medianFilter <- function(dataMatrix, radius, times = 1){
 

@@ -4,7 +4,7 @@
 \alias{meanFilter}
 \alias{medianFilter}
 \alias{quantileFilter}
-\title{Make a 2D median filter calculation from numeric matrix}
+\title{Make a 2D filter calculations from numeric matrix}
 \usage{
 meanFilter(dataMatrix, radius, times = 1)
 
@@ -22,20 +22,20 @@ medianFilter(dataMatrix, radius, times = 1)
 \item{x}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
-It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+\code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 
-\code{quantileFilter} uses the kernel but, for each cell, it returns the position
+\code{quantileFilter} don't use a kernel but, for each cell, it returns the position
 of quantile 'x' (value between 0 and 1).
 
-\code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5
+\code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5.
 }
 \description{
-This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-the squared matrix of dimension \eqn{radius*radius}. Finally, it returns for each cell the median of the
-weighted sum.
+This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
+the squared matrix of dimension \eqn{radius*radius}. Finally and according to the type of function, they
+return for each cell the mean, median or the quantile of the weighted sum.
 }
 \details{
-This function uses the \code{engine2} C++ algorithm. More details are shown in vignette.
+Functions use the \code{engine4} and \code{engine5} C++ algorithms. More details are shown in vignette.
 }
 \examples{
 # Generate example matrix

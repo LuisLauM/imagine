@@ -3,30 +3,24 @@
 
 #' @importFrom Rcpp evalCpp
 #' @useDynLib imagine
+NULL
+
 engine1 <- function(data, kernel) {
     .Call('imagine_engine1', PACKAGE = 'imagine', data, kernel)
 }
 
-#' @importFrom Rcpp evalCpp
-#' @useDynLib imagine
 engine2 <- function(data, kernel) {
     .Call('imagine_engine2', PACKAGE = 'imagine', data, kernel)
 }
 
-#' @importFrom Rcpp evalCpp
-#' @useDynLib imagine
 engine3 <- function(data, kernel, x, maxValue) {
     .Call('imagine_engine3', PACKAGE = 'imagine', data, kernel, x, maxValue)
 }
 
-#' @importFrom Rcpp evalCpp
-#' @useDynLib imagine
 engine4 <- function(data, radius) {
     .Call('imagine_engine4', PACKAGE = 'imagine', data, radius)
 }
 
-#' @importFrom Rcpp evalCpp
-#' @useDynLib imagine
 engine5 <- function(data, radius, x, maxValue) {
     .Call('imagine_engine5', PACKAGE = 'imagine', data, radius, x, maxValue)
 }

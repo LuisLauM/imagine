@@ -25,21 +25,22 @@ convolutionMedian(dataMatrix, kernel, times = 1)
 \item{x}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
-It returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+\code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 
 \code{convolutionMean} uses the kernel but, for each cell, it returns the average.
 
 \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
 of quantile 'x' (value between 0 and 1).
 
-\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5
+\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5.
 }
 \description{
 This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 }
 \details{
-This function uses the \code{engine1} C++ algorithm. More details are shown in vignette.
+Functions use the \code{engine1}, \code{engine2}, \code{engine3} C++ algorithms.
+More details are shown in vignette.
 }
 \examples{
 # Generate example matrix
