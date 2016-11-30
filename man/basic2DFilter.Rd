@@ -39,8 +39,8 @@ Functions use the \code{engine4} and \code{engine5} C++ algorithms. More details
 }
 \examples{
 # Generate example matrix
-nRows <- 10
-nCols <- 20
+nRows <- 50
+nCols <- 100
 
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 radius <- 3

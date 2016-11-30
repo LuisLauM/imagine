@@ -32,8 +32,8 @@ NULL
 #'
 #' @examples
 #' # Generate example matrix
-#' nRows <- 10
-#' nCols <- 20
+#' nRows <- 50
+#' nCols <- 100
 #'
 #' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 #' kernel <- diag(3)
@@ -145,8 +145,8 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 #'
 #' @examples
 #' # Generate example matrix
-#' nRows <- 10
-#' nCols <- 20
+#' nRows <- 50
+#' nCols <- 100
 #'
 #' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 #' radius <- 3

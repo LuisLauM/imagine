@@ -1,8 +1,8 @@
 # 2D convolution -------------------------------------------------------------------------
 ####### First example: A complete filled data matrix #######
 # Generate example matrix
-nRows <- 1000
-nCols <- 2000
+nRows <- 50
+nCols <- 100
 
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 radius <- 3
@@ -25,8 +25,8 @@ image(myOutput3, zlim = c(0, 100), col = cols)
 
 ####### Second example: A data matrix with NA values #######
 # Generate example matrix
-nRows <- 100
-nCols <- 200
+nRows <- 50
+nCols <- 100
 
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 
@@ -35,7 +35,7 @@ index <- sample(x = seq(nRows*nCols), size = as.integer(nRows*nCols*0.2), replac
 myMatrix[index] <- NA
 
 # Build kernel
-radius <- 3
+radius <- 7
 kernel <- matrix(c(2, 1, 2, 1, 2,
                    1, 1, 1, 1, 1,
                    2, 1, 2, 2, 1), nrow = 3)

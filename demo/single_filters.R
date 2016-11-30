@@ -2,8 +2,8 @@
 # Single filters ----------------------------------------------------------
 
 # Generate example matrix
-nRows <- 100
-nCols <- 200
+nRows <- 50
+nCols <- 100
 
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 radius <- 3

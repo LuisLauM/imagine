@@ -33,6 +33,7 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 /src/*.o
+/src/*.so
 /src/*.dll
 /src/RcppExports.cpp
 /vignettes/vignette_cache/html/__packages
@@ -60,3 +61,4 @@ vignettes/*.pdf
 /README_files
 /README_files/figure-markdown_github/*.png
 /README_files/figure-markdown_github/*.png
+/.project
