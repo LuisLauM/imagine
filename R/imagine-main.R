@@ -2,7 +2,7 @@
 #'
 #' @author Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
 #' @name image-package
-#' @description Package for faster application of image filters to data matrices, using R and C++ algorithms.
+#' @description Provides fast application of image filters to data matrices, using R and C++ algorithms.
 #' @details This package uses C++ algorithms called 'engines'. More details are shown in vignette.
 #' @aliases imagine-package imagine
 #' @docType package

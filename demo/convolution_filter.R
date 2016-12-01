@@ -1,8 +1,8 @@
 # 2D convolution -------------------------------------------------------------------------
 ####### First example: The effect of convolution filters #######
 myMatrix <- wbImage
-kernel1 <- matrix(c(-1, -2, -1,
-                    0,  0,  0,
+kernel <- matrix(c(-1, -2, -1,
+                    1,  0,  1,
                     1,  2,  1), nrow = 3)
 
 # Make convolution
@@ -92,7 +92,7 @@ origMatrix_withNA[sample(seq(prod(dim(origMatrix))), 0.7*prod(dim(origMatrix)), 
 newMatrix <- quantileFilter(dataMatrix = origMatrix_withNA, radius = 3, x = 0.2, times = 4)
 
 # Plot matrices for compare
-cols <- colorRampPalette(c("white", "black"))(n)
+cols <- colorRampPalette(c("white", "black"))(1e3)
 
 par(mar = c(0, 2, 0, 0), mfrow = c(3, 1))
 
