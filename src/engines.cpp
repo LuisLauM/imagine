@@ -32,7 +32,9 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
           int b = j + n - 1;
 
           // Multiply the value of each cell by the corresponding value of the kernel.
-          cumSum += data(a, b)*kernel(m, n);
+          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1)) && (!std::isnan(data(a, b)))){
+            cumSum += data(a, b)*kernel(m, n);
+          }
         }
       }
 
@@ -62,7 +64,7 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
     for(int i = 0; i < nrows; i++){
 
       double cumSum = 0;
-      int k = 0;
+      int k = 1;
 
       for(int n = 0; n < knlcols; n++){
         for(int m = 0; m < knlrows; m++){
@@ -70,7 +72,7 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
           int b = j + n - 1;
 
           // Multiply the value of each cell by the corresponding value of the kernel.
-          if((a > 0) & (a < (nrows - 1)) & (b > 0) & (b < (ncols - 1)) & (!std::isnan(data(a, b)))){
+          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1)) && (!std::isnan(data(a, b)))){
             cumSum += data(a, b)*kernel(m, n);
             k += kernel(m, n);
           }
@@ -115,7 +117,7 @@ NumericMatrix engine3(NumericMatrix data, NumericMatrix kernel, double x, double
           int a = i + m - 1;
           int b = j + n - 1;
 
-          if((a < 0 ) | (a > (nrows - 1)) | (b < 0) | (b > (ncols - 1)) | (std::isnan(data(a, b)))){
+          if((a < 1 ) || (a > (nrows - 1)) || (b < 1) || (b > (ncols - 1)) || (std::isnan(data(a, b)))){
             miniMatrix[index] = maxValue;
           }else{
             miniMatrix[index] = data(a, b)*kernel(m, n);
@@ -147,7 +149,7 @@ NumericMatrix engine4(NumericMatrix data, int radius){
     for(int i = 0; i < nrows; i++){
 
       double cumSum = 0;
-      int k = 0;
+      int k = 1;
 
       for(int n = 0; n < radius; n++){
         for(int m = 0; m < radius; m++){
@@ -155,7 +157,7 @@ NumericMatrix engine4(NumericMatrix data, int radius){
           int a = i + m - 1;
           int b = j + n - 1;
 
-          if((a > 0) & (a < (nrows - 1)) & (b > 0) & (b < (ncols - 1)) & (!std::isnan(data(a, b)))){
+          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1)) && (!std::isnan(data(a, b)))){
             cumSum += data(a, b);
             k++;
           }
@@ -191,7 +193,7 @@ NumericMatrix engine5(NumericMatrix data, int radius, double x, double maxValue)
           int a = i + m - 1;
           int b = j + n - 1;
 
-          if((a < 0) | (a > (nrows - 1)) | (b < 0) | (b > (ncols - 1)) | (std::isnan(data(a, b)))){
+          if((a < 1) || (a > (nrows - 1)) || (b < 1) || (b > (ncols - 1)) || (std::isnan(data(a, b)))){
             miniMatrix[index] = maxValue;
           }else{
             miniMatrix[index] = data(a, b);
