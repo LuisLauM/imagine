@@ -1,20 +1,5 @@
----
-output: 
-  md_document:
-    variant: markdown_github
----
-
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-library(imagine)
-```
-
-
-# imagine
+imagine
+=======
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html)
 
@@ -22,30 +7,33 @@ library(imagine)
 
 This package uses C++ algorithms called 'engines'. More details are shown in vignette.
 
-## Installation
+Installation
+------------
 
 Get the development version from github:
 
-```R
+``` r
 # install.packages("devtools")
 devtools::install_github("LuisLauM/imagine")
 ```
 
 Or install the CRAN version
-```{r, eval=FALSE}
+
+``` r
 install.packages("imagine")
 ```
 
-
-## Input data
+Input data
+----------
 
 For all functions, the main input data must be a `numeric matrix` object. Depending on each funtion, user must indicate some extra arguments for the filter.
 
-## Examples
+Examples
+--------
 
 Next, we show the utility of `quantileFilter`, one of the six functions that `imagine` performs.
 
-```{r}
+``` r
 # Load imagine
 library(imagine)
 
@@ -75,3 +63,4 @@ image(newMatrix, col = cols, axes = FALSE)
 mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 ```
 
+![](README-unnamed-chunk-3-1.png)
