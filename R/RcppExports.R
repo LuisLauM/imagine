@@ -2,7 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @importFrom Rcpp evalCpp
-#' @useDynLib imagine
+#' @useDynLib imagine, .registration = TRUE
 NULL
 
 engine1 <- function(data, kernel) {

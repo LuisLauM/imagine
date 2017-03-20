@@ -3,8 +3,8 @@
 \name{convolution2D}
 \alias{convolution2D}
 \alias{convolutionMean}
-\alias{convolutionMedian}
 \alias{convolutionQuantile}
+\alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
 convolution2D(dataMatrix, kernel, times = 1)
@@ -62,4 +62,3 @@ image(myOutput1, zlim = c(0, 100))
 image(myOutput2, zlim = c(0, 100))
 image(myOutput3, zlim = c(0, 100))
 }
-

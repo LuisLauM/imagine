@@ -2,8 +2,8 @@
 % Please edit documentation in R/imagine-main.R
 \name{meanFilter}
 \alias{meanFilter}
-\alias{medianFilter}
 \alias{quantileFilter}
+\alias{medianFilter}
 \title{Make a 2D filter calculations from numeric matrix}
 \usage{
 meanFilter(dataMatrix, radius, times = 1)
@@ -56,4 +56,3 @@ image(myOutput1, zlim = c(0, 100))
 image(myOutput2, zlim = c(0, 100))
 image(myOutput3, zlim = c(0, 100))
 }
-

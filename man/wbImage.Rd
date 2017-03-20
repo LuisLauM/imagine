@@ -12,4 +12,3 @@ wbImage
 \code{matrix} object containig numeric data to plot a image. The photo was taken
 by the author at 2016.
 }
-

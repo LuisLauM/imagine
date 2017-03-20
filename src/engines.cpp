@@ -1,3 +1,5 @@
+// RegisteringDynamic Symbols
+
 #include <Rcpp.h>
 #include <algorithm>
 #include <math.h>
@@ -5,7 +7,7 @@
 using namespace Rcpp;
 
 //' @importFrom Rcpp evalCpp
-//' @useDynLib imagine
+//' @useDynLib imagine, .registration = TRUE
 
 // ENGINE 1
 // [[Rcpp::export]]

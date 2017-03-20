@@ -3,8 +3,8 @@
 \docType{package}
 \name{image-package}
 \alias{image-package}
-\alias{imagine}
 \alias{imagine-package}
+\alias{imagine}
 \title{Imaging Engine, Tools for application of image filters to data matrices}
 \description{
 Provides fast application of image filters to data matrices, using R and C++ algorithms.
@@ -17,4 +17,3 @@ Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
 }
 \keyword{image-filter}
 \keyword{image-matrix,}
-
