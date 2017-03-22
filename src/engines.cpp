@@ -1,5 +1,3 @@
-// RegisteringDynamic Symbols
-
 #include <Rcpp.h>
 #include <algorithm>
 #include <math.h>

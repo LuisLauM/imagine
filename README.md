@@ -62,5 +62,3 @@ mtext(text = "Original with NAs", side = 2, line = 0.5, font = 2)
 image(newMatrix, col = cols, axes = FALSE)
 mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 ```
-
-![](README-unnamed-chunk-3-1.png)
