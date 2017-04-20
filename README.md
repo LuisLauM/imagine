@@ -1,8 +1,7 @@
 imagine
 =======
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html)
-
+<!-- [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html) -->
 **Provides fast application of image filters to data matrices**
 
 This package uses C++ algorithms called 'engines'. More details are shown in vignette.
