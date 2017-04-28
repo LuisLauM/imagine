@@ -39,9 +39,9 @@ kernel1 <- matrix(c(-1, -2, -1,
                      1,  2,  1), nrow = 3)
 
 # Kernel 2: Diagonal weighting
-kernel2 <- matrix(c(1, 2, 1,
-                    2, 4, 2,
-                    1, 2, 1), nrow = 3)
+kernel2 <- matrix(c(1, 0, 1,
+                    0, 2, 0,
+                    1, 0, 1), nrow = 3)
 
 # Apply filters
 convolutionExample  <- convolution2D(dataMatrix = myMatrix, kernel = kernel1)
@@ -63,26 +63,21 @@ convQuantileExample[convQuantileExample < 0] <- 0
 image(convQuantileExample, col = cols, axes = FALSE)
 mtext(text = "2D median convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
-## ---- eval=FALSE---------------------------------------------------------
-#  # Add some noise (NA) to the image (matrix)
-#  set.seed(7)
-#  naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
-#  myMatrix[naIndex] <- NA
+## ---- eval=FALSE-------------------------------------------------------
+#  # # Add some noise (NA) to the image (matrix)
+#  # naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
+#  # myMatrix[naIndex] <- NA
 #  
 #  # Build kernel
 #  radius <- 3
 #  
 #  # Apply filters
-#  meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
-#  quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
-#  medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius)
+#  meanfilterExample     <- meanFilter(dataMatrix = wbImage, radius = radius)
+#  quantilefilterExample <- quantileFilter(dataMatrix = wbImage, radius = radius, x = 0.1)
+#  medianfilterExample   <- medianFilter(dataMatrix = wbImage, radius = radius)
 #  
 
 ## ---- message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
-set.seed(7)
-naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
-myMatrix[naIndex] <- NA
-
 par(mar = rep(0, 4), mfrow = c(1, 1))
 image(myMatrix, col = cols)
 
@@ -90,18 +85,10 @@ image(myMatrix, col = cols)
 # Build kernel
 radius <- 3
 
-# Add some noise (NA) to the image (matrix)
-set.seed(7)
-naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)
-myMatrix[naIndex] <- NA
-
-# Build kernel
-radius <- 3
-
 # Apply filters
-meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
-quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
-medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius)
+meanfilterExample     <- meanFilter(dataMatrix = wbImage, radius = radius)
+quantilefilterExample <- quantileFilter(dataMatrix = wbImage, radius = radius, x = 0.1)
+medianfilterExample   <- medianFilter(dataMatrix = wbImage, radius = radius)
 
 # Make plots
 par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
