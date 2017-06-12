@@ -18,7 +18,6 @@ library(imagine)
 #  
 #  # Apply filters
 #  convolutionExample  <- convolution2D(dataMatrix = wbImage, kernel = kernel1)
-#  convMeanExample     <- convolutionMean(dataMatrix = wbImage, kernel = kernel2)
 #  convQuantileExample <- convolutionQuantile(dataMatrix = wbImage, kernel = kernel2, x = 0.7)
 #  
 
@@ -28,7 +27,7 @@ cols <- colorRampPalette(colors = c("black", "white"))(1e4)
 
 image(wbImage, col = cols)
 
-## ---- message=FALSE, fig.height=9, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE----
+## ---- message=FALSE, fig.height=6, fig.width=5.33, fig.cap = "Figure 1: Filtered matrices", results='hide', fig.pos="h", echo=FALSE----
 
 myMatrix <- wbImage
 
@@ -45,19 +44,14 @@ kernel2 <- matrix(c(1, 2, 1,
 
 # Apply filters
 convolutionExample  <- convolution2D(dataMatrix = myMatrix, kernel = kernel1)
-convMeanExample     <- convolutionMean(dataMatrix = myMatrix, kernel = kernel2)
 convQuantileExample <- convolutionQuantile(dataMatrix = myMatrix, kernel = kernel2, x = 0.7)
 
 # Make plots
-par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
+par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(2, 1))
 
 convolutionExample[convolutionExample < 0] <- 0
 image(convolutionExample, col = cols, axes = FALSE)
 mtext(text = "2D convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
-
-convMeanExample[convMeanExample < 0] <- 0
-image(convMeanExample, col = cols, axes = FALSE)
-mtext(text = "2D mean convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
 convQuantileExample[convQuantileExample < 0] <- 0
 image(convQuantileExample, col = cols, axes = FALSE)

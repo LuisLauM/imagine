@@ -23,8 +23,9 @@ NULL
 #'
 #' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 #'
-#' @details Functions use the \code{engine1}, \code{engine2}, \code{engine3} C++ algorithms.
-#' More details are shown in vignette.
+#' @details
+#' Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
+#' to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in vignette.
 #'
 #' @export
 #'
@@ -38,15 +39,13 @@ NULL
 #'
 #' # Make convolution
 #' myOutput1 <- convolution2D(myMatrix, kernel)
-#' myOutput2 <- convolutionMean(myMatrix, kernel)
-#' myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
+#' myOutput2 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 #'
 #' # Plot results
 #' par(mfrow = c(2, 2))
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-#' image(myOutput3, zlim = c(0, 100))
 convolution2D <- function(dataMatrix, kernel, times = 1){
 
   # Check and validation of arguments
@@ -59,27 +58,6 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
     gc(reset = TRUE)
 
     output <- with(checkedArgs, engine1(data = output, kernel = kernel))
-
-  }
-
-  return(output)
-}
-
-#' @rdname convolutions
-#' @return \code{convolutionMean} uses the kernel but, for each cell, it returns the average.
-#' @export
-convolutionMean <- function(dataMatrix, kernel, times = 1){
-
-  # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
-
-  # Apply filters
-  output <- checkedArgs$dataMatrix
-  for(i in seq(times)){
-    gc(reset = TRUE)
-
-    output <- with(checkedArgs, engine2(data = output, kernel = kernel))
 
   }
 
@@ -140,7 +118,7 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 #'
 #' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 #'
-#' @details Functions use the \code{engine4} and \code{engine5} C++ algorithms. More details are shown in vignette.
+#' @details Functions use C++ algorithms. More details are shown in vignette.
 #' @export
 #'
 #' @examples

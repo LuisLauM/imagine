@@ -2,14 +2,11 @@
 % Please edit documentation in R/imagine-main.R
 \name{convolution2D}
 \alias{convolution2D}
-\alias{convolutionMean}
 \alias{convolutionQuantile}
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
 convolution2D(dataMatrix, kernel, times = 1)
-
-convolutionMean(dataMatrix, kernel, times = 1)
 
 convolutionQuantile(dataMatrix, kernel, x, times = 1)
 
@@ -27,8 +24,6 @@ convolutionMedian(dataMatrix, kernel, times = 1)
 \value{
 \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 
-\code{convolutionMean} uses the kernel but, for each cell, it returns the average.
-
 \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
 of quantile 'x' (value between 0 and 1).
 
@@ -39,8 +34,8 @@ This function takes a \code{matrix} object, and for each cell multiplies its nei
 the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 }
 \details{
-Functions use the \code{engine1}, \code{engine2}, \code{engine3} C++ algorithms.
-More details are shown in vignette.
+Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
+to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in vignette.
 }
 \examples{
 # Generate example matrix
@@ -52,13 +47,11 @@ kernel <- diag(3)
 
 # Make convolution
 myOutput1 <- convolution2D(myMatrix, kernel)
-myOutput2 <- convolutionMean(myMatrix, kernel)
-myOutput3 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
+myOutput2 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
 
 # Plot results
 par(mfrow = c(2, 2))
 image(myMatrix, zlim = c(0, 100))
 image(myOutput1, zlim = c(0, 100))
 image(myOutput2, zlim = c(0, 100))
-image(myOutput3, zlim = c(0, 100))
 }

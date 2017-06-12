@@ -1,7 +1,7 @@
 Package: imagine
 Type: Package
 Title: Imaging Engine, Tools for Application of Image Filters to Data Matrices
-Version: 1.1.1
+Version: 1.2.1
 Date: 2017-03-20
 URL: https://github.com/LuisLauM/imagine
 BugReports: https://github.com/LuisLauM/imagine/issues
@@ -12,7 +12,7 @@ Description: Provides fast application of image filters to data matrices,
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
-    R (>= 3.2.0)
+    R (>= 3.1.0)
 Imports:
     Rcpp
 LinkingTo: Rcpp

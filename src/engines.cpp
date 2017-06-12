@@ -51,6 +51,8 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
 NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel){
 
   // Engine 2: Convolution mean
+  // For now, this function is not available because the output is equivalent to
+  // multiplying the matrices by a constant.
 
   int nrows = data.nrow();
   int ncols = data.ncol();

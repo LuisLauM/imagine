@@ -35,7 +35,7 @@ the squared matrix of dimension \eqn{radius*radius}. Finally and according to th
 return for each cell the mean, median or the quantile of the weighted sum.
 }
 \details{
-Functions use the \code{engine4} and \code{engine5} C++ algorithms. More details are shown in vignette.
+Functions use C++ algorithms. More details are shown in vignette.
 }
 \examples{
 # Generate example matrix
