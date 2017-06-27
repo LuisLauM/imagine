@@ -76,9 +76,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="imagine" class="section level1">
 <h1>imagine</h1>
-<p><strong>Imaging Engine, Tools for Application of Image Filters to Data Matrices</strong></p>
+<p><strong>IMAGing engINE, Tools for Application of Image Filters to Data Matrices</strong></p>
 <p>This package was built to take numeric data matrices and apply image-filtering algoriths.</p>
-<p>Algoriths used by <code>imagine</code> include median-filter and 2D-convolution based algoriths implemented on Rcpp (C++) because sometimes the applicaion of this filters to large numeric matrices is very intensive and time expensive.</p>
+<p>Algoriths used by <code>imagine</code> include median-filter and 2D-convolution based algoriths implemented on Rcpp (C++) due to the high intensiveness and time expensiveness in the application of this filters to large numeric matrices.</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>For installing <code>imagine</code>, as follows:</p>
@@ -86,18 +86,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="engines" class="section level2">
 <h2>Engines</h2>
-<p><code>imagine</code> performs algorithms written in Rcpp (called ‘engines’), ensuring a faster application of filters. At version 1.0.0, <code>imagine</code> include five main engines, described as follows:</p>
+<p><code>imagine</code> performs algorithms written in Rcpp (called ‘engines’), ensuring a faster application of filters. At version 1.2.2, <code>imagine</code> include four main engines, described as follows:</p>
 <ul>
-<li>Engine 1: Basic convolution algorithm. Multiplies kernel by the neighborhood of each cell. Then, it sums all values.</li>
-<li>Engine 2: Multiplies kernel by the neighborhood of each cell. Then, it returns the average of all values.</li>
-<li>Engine 3: Multiplies kernel by the neighborhood of each cell. Then, it returns the position indicated by the parameter <code>x</code>.</li>
-<li>Engine 4: It uses the <code>radius</code> argument to extract the values of squared neighborhood (<span class="math inline">\(radius \times radius\)</span>) and calculates the mean.</li>
-<li>Engine 5: It uses the <code>radius</code> argument to extract the values of squared neighborhood (<span class="math inline">\(radius \times radius\)</span>) and returns the position indicated by the parameter <code>x</code></li>
+<li>Engine 1: Basic 2D-convolution algorithm. It multiplies kernel by the neighborhood of each cell and then it sums all values.</li>
+<li>Engine 2: Make the same of Engine 1 but, at the end, it returns the position indicated by the parameter <code>x</code>.</li>
+<li>Engine 3: It uses the <code>radius</code> argument to extract the values of squared neighborhood (<span class="math inline">\(radius \times radius\)</span>) and calculates the mean.</li>
+<li>Engine 4: It uses the <code>radius</code> argument to extract the values of squared neighborhood (<span class="math inline">\(radius \times radius\)</span>) and returns the position indicated by the parameter <code>x</code></li>
 </ul>
 </div>
 <div id="main-functions" class="section level2">
 <h2>Main functions</h2>
-<p>There are 5 main functions and 2 wrappers at version 1.1.0, described as follows:</p>
+<p>There are 4 main functions and 2 wrappers:</p>
 <div id="convolution-functions" class="section level3">
 <h3>Convolution functions</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Build kernels</span>
@@ -109,8 +108,8 @@ kernel1 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class
 
 <span class="co"># Kernel 2: Diagonal weighting</span>
 kernel2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>,
-                    <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>,
-                    <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>), 
+                     <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>,
+                     <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>), 
                   <span class="dt">nrow =</span> <span class="dv">3</span>)
 
 <span class="co"># Apply filters</span>
@@ -157,8 +156,8 @@ medianfilterExample   &lt;-<span class="st"> </span><span class="kw">medianFilte
 </div>
 <div id="kernel-application" class="section level2">
 <h2>Kernel application</h2>
-<p>In the field of image processing, one of the tools most commonly used are the <strong>convolutions</strong>, which consist of operations between two arrays: The array of image data and small matrices, called kernels, which weights each pixel values with its corresponding neighborhood. Different kernels produce different effects, for instance blur, shifted images (right, left, up or down), sharpening, etc.</p>
-<p>The larger the radius, more pixels remain unanalyzed at the edges. In addition, <code>kernel</code> argument of <code>convolution2D</code> is a matrix, but unlike the <code>meanFilter2D</code> and <code>meanFilter2D</code> functions, it should not necessarily have square dimensions. So, if the user specifies a rectangular kernel, the function will use the neighborhood as the Figure 3 shows.</p>
+<p>In the field of image processing, one of the tools most commonly used are the <strong>convolutions</strong>, which consist of operations between two arrays: The array of image data (as a big matrix) and kernels (as small matrices) which weighs each pixel values by the values of its corresponding neighborhood. Different kernels produce different effects, for instance: blur, shifted images (right, left, up or down), sharpening, etc.</p>
+<p>The users must be cautious with the size of the kernel because the larger the radius, the more pixels remain unanalyzed at the edges. In addition, <code>kernel</code> argument of <code>convolution2D</code> is a matrix and it should not necessarily have squared dimensions. So, if the user specifies a rectangular kernel, the function will use the neighborhood as the Figure 3 shows.</p>
 <div class="figure">
 <img src="data:image/png;base64,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" alt="Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application" />
 <p class="caption">Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application</p>

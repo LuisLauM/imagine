@@ -5,7 +5,7 @@
 \alias{image-package}
 \alias{imagine-package}
 \alias{imagine}
-\title{Imaging Engine, Tools for application of image filters to data matrices}
+\title{IMAGing engINE, Tools for application of image filters to data matrices}
 \description{
 Provides fast application of image filters to data matrices, using R and C++ algorithms.
 }

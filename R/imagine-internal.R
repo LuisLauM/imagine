@@ -2,7 +2,6 @@ checkArgs <- function(imagineArgs, type){
 
   output <- switch(type,
                    convolution2D       = checkArgs_convolution2D(imagineArgs),
-                   convolutionMean     = checkArgs_convolutionMean(imagineArgs),
                    convolutionQuantile = checkArgs_convolutionQuantile(imagineArgs),
                    meanFilter          = checkArgs_meanFilter(imagineArgs),
                    quantileFilter      = checkArgs_quantileFilter(imagineArgs),
@@ -31,39 +30,6 @@ checkArgs_convolution2D <- function(allArgs){
   }
 
   kernel <- matrix(data = round(an(kernel), 0), nrow = nrow(kernel))
-
-  if(length(times) != 1 || mode(times) != "numeric"){
-    stop("'time' must be a numeric vector with length 1.")
-  }
-
-  times <- as.integer(times)
-
-  return(allArgs)
-}
-
-checkArgs_convolutionMean <- function(allArgs){
-
-  dataMatrix <- allArgs$dataMatrix
-  kernel <- allArgs$kernel
-  times <- allArgs$times
-
-  if(class(dataMatrix) != "matrix" || mode(dataMatrix) != "numeric"){
-    stop("'datMatrix' must be a numeric matrix.")
-  }
-
-  if(class(kernel) != "matrix" || mode(kernel) != "numeric"){
-    stop("'kernel' must be a numeric matrix.")
-  }
-
-  if((nrow(kernel) >= nrow(dataMatrix)) || ncol(kernel) >= ncol(dataMatrix)){
-    stop("Dimensions of 'kernel' matrix must be less than the 'dataMatrix'.")
-  }
-
-  kernel <- matrix(data = round(an(kernel), 0), nrow = nrow(kernel))
-
-  if(sum(an(kernel)) <= 0){
-    stop("For 'convolutionMean', kernel values sum must be higher than zero.")
-  }
 
   if(length(times) != 1 || mode(times) != "numeric"){
     stop("'time' must be a numeric vector with length 1.")
