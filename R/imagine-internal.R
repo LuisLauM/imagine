@@ -16,6 +16,7 @@ checkArgs_convolution2D <- function(allArgs){
   dataMatrix <- allArgs$dataMatrix
   kernel <- allArgs$kernel
   times <- allArgs$times
+  noNA <- allArgs$noNA
 
   if(class(dataMatrix) != "matrix" || mode(dataMatrix) != "numeric"){
     stop("'datMatrix' must be a numeric matrix.")
@@ -36,6 +37,12 @@ checkArgs_convolution2D <- function(allArgs){
   }
 
   times <- as.integer(times)
+
+  if(!is.logical(noNA)){
+    noNA <- isTRUE(noNA)
+
+    warning("Given 'noNA' was not logical. Default value (FALSE) was taken.")
+  }
 
   return(allArgs)
 }

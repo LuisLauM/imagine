@@ -9,7 +9,7 @@ using namespace Rcpp;
 
 // ENGINE 1: 2D convolution
 // [[Rcpp::export]]
-NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
+NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = false){
 
   // Define dimension of matrix
   int nrows = data.nrow();
@@ -17,6 +17,13 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
 
   int knlrows = kernel.nrow();
   int knlcols = kernel.ncol();
+
+  bool threshold = 1;
+
+  // If noNA is TRUE, define threshold as prod of dims of kernel
+  if(!noNA){
+    threshold = (knlrows*knlcols - 1);
+  }
 
   // Define output matrix, same dims of input
   NumericMatrix emptyData(nrows, ncols);
@@ -45,10 +52,10 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
       }
 
       // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
-      if(naSum < (knlrows*knlcols)){
-        emptyData(i, j) = cumSum;
-      }else{
+      if(naSum > threshold){
         emptyData(i, j) = NA_REAL;
+      }else{
+        emptyData(i, j) = cumSum;
       }
     }
   }
@@ -165,7 +172,6 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
           }
         }
       }
-
 
       // Sort values
       miniMatrix.sort();

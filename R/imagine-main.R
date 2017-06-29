@@ -17,6 +17,8 @@ NULL
 #' @param kernel A little matrix used as mask for each cell of \code{dataMatrix}.
 #' @param x \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
+#' @param noNA \code{logical} indicating whether to make convolution only if all values within
+#' kernel are no \code{NA}.
 #'
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 #' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
@@ -46,10 +48,10 @@ NULL
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-convolution2D <- function(dataMatrix, kernel, times = 1){
+convolution2D <- function(dataMatrix, kernel, times = 1, noNA = FALSE){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times)
+  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times, noNA = noNA)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
 
   # Apply filters
@@ -57,7 +59,7 @@ convolution2D <- function(dataMatrix, kernel, times = 1){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine1(data = output, kernel = kernel))
+    output <- with(checkedArgs, engine1(data = output, kernel = kernel, noNA = noNA))
   }
 
   return(output)

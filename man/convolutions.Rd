@@ -6,7 +6,7 @@
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
-convolution2D(dataMatrix, kernel, times = 1)
+convolution2D(dataMatrix, kernel, times = 1, noNA = FALSE)
 
 convolutionQuantile(dataMatrix, kernel, x, times = 1)
 
@@ -18,6 +18,9 @@ convolutionMedian(dataMatrix, kernel, times = 1)
 \item{kernel}{A little matrix used as mask for each cell of \code{dataMatrix}.}
 
 \item{times}{How many times do you want to apply the filter?}
+
+\item{noNA}{\code{logical} indicating whether to make convolution only if all values within
+kernel are no \code{NA}.}
 
 \item{x}{\code{numeric} vector of probabilities with values in [0,1].}
 }
