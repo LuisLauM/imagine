@@ -62,3 +62,5 @@ vignettes/*.pdf
 /README_files/figure-markdown_github/*.png
 /README_files/figure-markdown_github/*.png
 /.project
+/src-i386
+/src-x64

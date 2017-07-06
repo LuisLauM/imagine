@@ -18,6 +18,12 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = fals
   int knlrows = kernel.nrow();
   int knlcols = kernel.ncol();
 
+  double knlRowHalfDouble = std::floor(knlrows/2);
+  int knlRowHalf = (int)round(knlRowHalfDouble);
+
+  double knlColHalfDouble = std::floor(knlcols/2);
+  int knlColHalf = (int)round(knlColHalfDouble);
+
   bool threshold = 1;
 
   // If noNA is TRUE, define threshold as prod of dims of kernel
@@ -31,17 +37,17 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = fals
   for(int j = 0; j < ncols; j++){
     for(int i = 0; i < nrows; i++){
 
-      double cumSum = 0;
-      double naSum = 0;
+      if((i > knlRowHalf) && (i < (nrows - knlRowHalf)) && (j > knlColHalf) && (j < (ncols - knlColHalf))){
+        double cumSum = 0;
+        double naSum = 0;
 
-      // Multiply the value of each cell by the corresponding value of the kernel.
-      for(int n = 0; n < knlcols; n++){
-        for(int m = 0; m < knlrows; m++){
-          int a = i + m - 1;
-          int b = j + n - 1;
+        // Multiply the value of each cell by the corresponding value of the kernel.
+        for(int n = 0; n < knlcols; n++){
+          for(int m = 0; m < knlrows; m++){
+            int a = i + m - knlRowHalf;
+            int b = j + n - knlColHalf;
 
-          // If the value is a NA do not consider for sum and increase the naSum index
-          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1))){
+            // If the value is a NA do not consider for sum and increase the naSum index
             if(std::isnan(data(a, b))){
               naSum++;
             }else{
@@ -49,13 +55,15 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = fals
             }
           }
         }
-      }
 
-      // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
-      if(naSum > threshold){
-        emptyData(i, j) = NA_REAL;
+        // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
+        if(naSum > threshold){
+          emptyData(i, j) = NA_REAL;
+        }else{
+          emptyData(i, j) = cumSum;
+        }
       }else{
-        emptyData(i, j) = cumSum;
+        emptyData(i, j) = NA_REAL;
       }
     }
   }
@@ -73,19 +81,25 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
   int knlrows = kernel.nrow();
   int knlcols = kernel.ncol();
 
+  double knlRowHalfDouble = std::floor(knlrows/2);
+  int knlRowHalf = (int)round(knlRowHalfDouble);
+
+  double knlColHalfDouble = std::floor(knlcols/2);
+  int knlColHalf = (int)round(knlColHalfDouble);
+
   NumericMatrix emptyData(nrows, ncols);
   NumericVector miniMatrix(knlrows*knlcols);
 
   for(int j = 0; j < ncols; j++){
     for(int i = 0; i < nrows; i++){
 
-      for(int n = 0; n < knlcols; n++){
-        for(int m = 0; m < knlrows; m++){
-          int index = m*knlcols + n;
-          int a = i + m - 1;
-          int b = j + n - 1;
+      if((i > knlRowHalf) && (i < (nrows - knlRowHalf)) && (j > knlColHalf) && (j < (ncols - knlColHalf))){
+        for(int n = 0; n < knlcols; n++){
+          for(int m = 0; m < knlrows; m++){
+            int index = m*knlcols + n;
+            int a = i + m - knlRowHalf;
+            int b = j + n - knlColHalf;
 
-          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1))){
             if(std::isnan(data(a, b))){
               miniMatrix[index] = NA_REAL;
             }else{
@@ -93,14 +107,15 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
             }
           }
         }
+
+        // Sort values
+        miniMatrix.sort();
+
+        // Get value for position indicated by 'x'
+        emptyData(i, j) = miniMatrix[x];
+      }else{
+        emptyData(i, j) = NA_REAL;
       }
-
-      // Sort values
-      miniMatrix.sort();
-
-      // Get value for position indicated by 'x'
-      emptyData(i, j) = miniMatrix[x];
-
     }
   }
 
@@ -115,30 +130,38 @@ NumericMatrix engine3(NumericMatrix data, int radius){
 
   NumericMatrix emptyData(nrows, ncols);
 
+  double halfRadiusDouble = std::floor(radius/2);
+  int halfRadius = (int)round(halfRadiusDouble);
+
   for(int j = 0; j < ncols; j++){
     for(int i = 0; i < nrows; i++){
 
-      double cumSum = 0;
-      int k = 1;
+      if((i > halfRadius) && (i < (nrows - halfRadius)) && (j > halfRadius) && (j < (ncols - halfRadius))){
+        double cumSum = 0;
+        int k = 1;
 
-      for(int n = 0; n < radius; n++){
-        for(int m = 0; m < radius; m++){
+        for(int n = 0; n < radius; n++){
+          for(int m = 0; m < radius; m++){
 
-          int a = i + m - 1;
-          int b = j + n - 1;
+            int a = i + m - halfRadius;
+            int b = j + n - halfRadius;
 
-          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1)) && (!std::isnan(data(a, b)))){
-            cumSum += data(a, b);
-            k++;
+            if(!std::isnan(data(a, b))){
+              cumSum += data(a, b);
+              k++;
+            }
           }
         }
+
+        if(k < 1){
+          emptyData(i, j) = NA_REAL;
+        }else{
+          emptyData(i, j) = cumSum/k;
+        }
+      }else{
+        emptyData(i, j) = NA_REAL;
       }
 
-      if(k < 1){
-        emptyData(i, j) = NA_REAL;
-      }else{
-        emptyData(i, j) = cumSum/k;
-      }
     }
   }
 
@@ -154,16 +177,20 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
   NumericMatrix emptyData(nrows, ncols);
   NumericVector miniMatrix(radius*radius);
 
+  double halfRadiusDouble = std::floor(radius/2);
+  int halfRadius = (int)round(halfRadiusDouble);
+
   for(int j = 0; j < ncols; j++){
     for(int i = 0; i < nrows; i++){
 
-      for(int n = 0; n < radius; n++){
-        for(int m = 0; m < radius; m++){
-          int index = m*radius + n;
-          int a = i + m - 1;
-          int b = j + n - 1;
+      // Only if i and j is within limits, apply filter
+      if((i > halfRadius) && (i < (nrows - halfRadius)) && (j > halfRadius) && (j < (ncols - halfRadius))){
+        for(int n = 0; n < radius; n++){
+          for(int m = 0; m < radius; m++){
+            int index = m*radius + n;
+            int a = i + m - halfRadius;
+            int b = j + n - halfRadius;
 
-          if((a > 1) && (a < (nrows - 1)) && (b > 1) && (b < (ncols - 1))){
             if(std::isnan(data(a, b))){
               miniMatrix[index] = NA_REAL;
             }else{
@@ -171,13 +198,15 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
             }
           }
         }
+
+        // Sort values
+        miniMatrix.sort();
+
+        // Get value for position indicated by 'x'
+        emptyData(i, j) = miniMatrix[x];
+      }else{
+        emptyData(i, j) = NA_REAL;
       }
-
-      // Sort values
-      miniMatrix.sort();
-
-      // Get value for position indicated by 'x'
-      emptyData(i, j) = miniMatrix[x];
     }
   }
 
