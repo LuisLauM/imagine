@@ -1,5 +1,5 @@
 # use c as catch-all language
-language: c
+language: r
 
 # Build and check package
 script:
