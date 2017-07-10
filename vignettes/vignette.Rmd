@@ -184,10 +184,11 @@ The users must be cautious with the size of the kernel because the larger the ra
 ```{r, message=FALSE, fig.height=2, fig.width=5.7, fig.cap = "Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application", results='hide', fig.pos="h", echo=FALSE}
 par(mar = rep(0, 4), mfrow = c(1, 3), xaxs = "i", yaxs = "i")
 
-xlim <- c(-0.15, 1.1)
-ylim <- c(-0.01, 1.3)
-
 plotKernels <- function(dim1 = 3, dim2 = 3, showArrows = FALSE){
+  
+  xlim <- c(-0.15, 1.1)
+  ylim <- c(-0.01, 1.3)
+
   plot(1, 1, pch = NA, axes = FALSE, xlim = xlim, ylim = ylim, xlab = NA, ylab = NA)
   polygon(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
   
