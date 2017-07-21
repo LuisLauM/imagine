@@ -9,7 +9,7 @@ using namespace Rcpp;
 
 // ENGINE 1: 2D convolution
 // [[Rcpp::export]]
-NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = false){
+NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA){
 
   // Define dimension of matrix
   int nrows = data.nrow();
@@ -24,11 +24,11 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = fals
   double knlColHalfDouble = std::floor(knlcols/2);
   int knlColHalf = (int)round(knlColHalfDouble);
 
-  bool threshold = 1;
+  int threshold = (knlrows*knlcols - 1);
 
   // If noNA is TRUE, define threshold as prod of dims of kernel
-  if(!noNA){
-    threshold = (knlrows*knlcols - 1);
+  if(noNA){
+    threshold = 1;
   }
 
   // Define output matrix, same dims of input
@@ -37,9 +37,9 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA = fals
   for(int j = 0; j < ncols; j++){
     for(int i = 0; i < nrows; i++){
 
-      if((i > knlRowHalf) && (i < (nrows - knlRowHalf)) && (j > knlColHalf) && (j < (ncols - knlColHalf))){
+      if((i > (knlRowHalf - 1)) && (i < (nrows - knlRowHalf)) && (j > (knlColHalf - 1)) && (j < (ncols - knlColHalf))){
         double cumSum = 0;
-        double naSum = 0;
+        int naSum = 0;
 
         // Multiply the value of each cell by the corresponding value of the kernel.
         for(int n = 0; n < knlcols; n++){

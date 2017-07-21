@@ -5,7 +5,7 @@
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine1 <- function(data, kernel, noNA = FALSE) {
+engine1 <- function(data, kernel, noNA) {
     .Call(imagine_engine1, data, kernel, noNA)
 }
 
