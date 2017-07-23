@@ -6,18 +6,18 @@
 NULL
 
 engine1 <- function(data, kernel, noNA) {
-    .Call(imagine_engine1, data, kernel, noNA)
+    .Call(`_imagine_engine1`, data, kernel, noNA)
 }
 
 engine2 <- function(data, kernel, x) {
-    .Call(imagine_engine2, data, kernel, x)
+    .Call(`_imagine_engine2`, data, kernel, x)
 }
 
 engine3 <- function(data, radius) {
-    .Call(imagine_engine3, data, radius)
+    .Call(`_imagine_engine3`, data, radius)
 }
 
 engine4 <- function(data, radius, x) {
-    .Call(imagine_engine4, data, radius, x)
+    .Call(`_imagine_engine4`, data, radius, x)
 }
 

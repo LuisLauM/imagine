@@ -28,7 +28,7 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA){
 
   // If noNA is TRUE, define threshold as prod of dims of kernel
   if(noNA){
-    threshold = 1;
+    threshold = 0;
   }
 
   // Define output matrix, same dims of input
