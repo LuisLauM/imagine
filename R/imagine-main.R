@@ -188,6 +188,54 @@ medianFilter <- function(dataMatrix, radius, times = 1){
   return(output)
 }
 
+#' Performs Contextual Median Filter
+#'
+#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
+#' @param inner_radius Size of the Inner squared kernel to apply median. Check Details.
+#' @param outer_radius Size of the Outer squared kernel to apply median. Check Details.
+#' @param x \code{numeric} vector of probabilities with values in [0,1].
+#' @param times How many times do you want to apply the filter?
+#'
+#' @description This function performs a generalization of the Contextual Median Filter propose by
+#' Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but it allows
+#' the users to modify values like the inner/outer matrices (check the paper for extra information) as
+#' well as the quantile (as default, for median: \code{x = 0.5}) and the number of applications (\code{x}).
+#'
+#' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @export
+#'
+#' @examples
+#' # Generate example matrix
+#' nRows <- 50
+#' nCols <- 100
+#'
+#' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
+#'
+#' # Make convolution
+#' myOutput <- contextualMF(dataMatrix = myMatrix)
+#'
+#' # Plot results
+#' image(myOutput, zlim = c(0, 100))
+contextualMF <- function(dataMatrix, inner_radius = 3, outer_radius = 5, x = 0.5, times = 1){
+
+  # Check and validation of arguments
+  checkedArgs <- list(dataMatrix = dataMatrix, inner_radius = inner_radius, outer_radius = outer_radius,
+                      x = x, times = times)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+
+  checkedArgs$x <- ceiling(checkedArgs$x*inner_radius^2) - 1
+
+  # Apply filters
+  output <- checkedArgs$dataMatrix
+  for(i in seq(checkedArgs$times)){
+    gc(reset = TRUE)
+
+    output <- with(checkedArgs, engine5(data = output, I_radius = inner_radius, O_radius = outer_radius, x = x))
+  }
+
+  return(output)
+}
+
 
 #' @title Data matrix to be used as example image.
 #' @name wbImage

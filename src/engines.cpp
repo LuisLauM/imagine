@@ -212,3 +212,99 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
 
   return emptyData;
 }
+
+// ENGINE 5: Contextual Median Filter
+// Proposed by Belkin et al. (2009), doi:10.1016/j.jmarsys.2008.11.018
+// [[Rcpp::export]]
+NumericMatrix engine5(NumericMatrix data, double x, int I_radius, int O_radius){
+  int nrows = data.nrow();
+  int ncols = data.ncol();
+
+  NumericMatrix emptyData(nrows, ncols);
+  NumericVector O_miniMatrix(O_radius*O_radius);
+  NumericVector I_miniMatrix(I_radius*I_radius);
+
+  double I_halfRadiusDouble = std::floor(I_radius/2);
+  int I_halfRadius = (int)round(I_halfRadiusDouble);
+
+  double O_halfRadiusDouble = std::floor(O_radius/2);
+  int O_halfRadius = (int)round(O_halfRadiusDouble);
+
+  for(int j = 0; j < ncols; j++){
+    for(int i = 0; i < nrows; i++){
+
+      // Only if i and j is within limits, apply filter
+      if((i > O_halfRadius) && (i < (nrows - O_halfRadius)) && (j > O_halfRadius) && (j < (ncols - O_halfRadius))){
+
+        // Check Outer filter
+        int naCounter = 0;
+        for(int n = 0; n < O_radius; n++){
+          for(int m = 0; m < O_radius; m++){
+            int index = m*O_radius + n;
+            int a = i + m - O_halfRadius;
+            int b = j + n - O_halfRadius;
+
+            if(std::isnan(data(a, b))){
+              O_miniMatrix[index] = NA_REAL;
+              naCounter++;
+            }else{
+              O_miniMatrix[index] = data(a, b);
+            }
+          }
+        }
+
+        if(naCounter == (O_radius*O_radius)){
+          emptyData(i, j) = NA_REAL;
+        }else{
+          double maxMini = max(O_miniMatrix);
+          double minMini = min(O_miniMatrix);
+
+          // Check the Outer filter
+          // If TRUE, keep the grid value
+          if((data(i, j) == minMini) | (data(i, j) == maxMini)){
+            emptyData(i, j) = data(i, j);
+          }else{
+            // If FALSE, apply the Inner filter
+            // Check Inner filter
+            naCounter = 0;
+            for(int n = 0; n < I_radius; n++){
+              for(int m = 0; m < I_radius; m++){
+                int index = m*I_radius + n;
+                int a = i + m - I_halfRadius;
+                int b = j + n - I_halfRadius;
+
+                if(std::isnan(data(a, b))){
+                  I_miniMatrix[index] = NA_REAL;
+                  naCounter++;
+                }else{
+                  I_miniMatrix[index] = data(a, b);
+                }
+              }
+            }
+
+            if(naCounter == (I_radius*I_radius)){
+              emptyData(i, j) = NA_REAL;
+            }else{
+              double maxMini = max(I_miniMatrix);
+              double minMini = min(I_miniMatrix);
+
+              if((data(i, j) == minMini) | (data(i, j) == maxMini)){
+                // Sort values
+                I_miniMatrix.sort();
+
+                // Put the median value of the Inner miniMatrix
+                emptyData(i, j) = I_miniMatrix[x];
+              }else{
+                emptyData(i, j) = data(i, j);
+              }
+            }
+          }
+        }
+      }else{
+        emptyData(i, j) = NA_REAL;
+      }
+    }
+  }
+
+  return emptyData;
+}
