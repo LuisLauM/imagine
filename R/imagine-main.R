@@ -3,7 +3,7 @@
 #' @author Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
 #' @name image-package
 #' @description Provides fast application of image filters to data matrices, using R and C++ algorithms.
-#' @details This package uses C++ algorithms called 'engines'. More details are shown in vignette.
+#' @details This package uses C++ algorithms called 'engines'. More details are shown in the vignette.
 #' @aliases imagine-package imagine
 #' @docType package
 #' @keywords image-matrix, image-filter
@@ -18,7 +18,7 @@ NULL
 #' @param x \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #' @param noNA \code{logical} indicating whether to make convolution only if all values within
-#' kernel are no \code{NA}.
+#' kernel are not \code{NA}.
 #'
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 #' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
@@ -27,7 +27,7 @@ NULL
 #'
 #' @details
 #' Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
-#' to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in vignette.
+#' to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in the vignette.
 #'
 #' @export
 #'
@@ -52,7 +52,7 @@ convolution2D <- function(dataMatrix, kernel, times = 1, noNA = FALSE){
 
   # Check and validation of arguments
   checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times, noNA = noNA)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolution2D")
 
   # Apply filters
   output <- checkedArgs$dataMatrix
@@ -73,7 +73,7 @@ convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
 
   # Check and validation of arguments
   checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, x = x, times = times)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolutionQuantile")
 
   checkedArgs$x <- ceiling(checkedArgs$x*prod(dim(kernel))) - 1
 
@@ -115,7 +115,7 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 #'
 #' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
 #'
-#' @details Functions use C++ algorithms. More details are shown in vignette.
+#' @details Functions use C++ algorithms. More details are shown in the vignette.
 #' @export
 #'
 #' @examples
@@ -140,7 +140,7 @@ meanFilter <- function(dataMatrix, radius, times = 1){
 
   # Check and validation of arguments
   checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, times = times)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "meanFilter")
 
   # Apply filters
   output <- checkedArgs$dataMatrix
@@ -162,7 +162,7 @@ quantileFilter <- function(dataMatrix, radius, x, times = 1){
 
   # Check and validation of arguments
   checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, x = x, times = times)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "quantileFilter")
 
   checkedArgs$x <- ceiling(checkedArgs$x*radius^2) - 1
 
@@ -221,7 +221,7 @@ contextualMF <- function(dataMatrix, inner_radius = 3, outer_radius = 5, x = 0.5
   # Check and validation of arguments
   checkedArgs <- list(dataMatrix = dataMatrix, inner_radius = inner_radius, outer_radius = outer_radius,
                       x = x, times = times)
-  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = as.character(match.call())[1])
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
 
   checkedArgs$x <- ceiling(checkedArgs$x*inner_radius^2) - 1
 
