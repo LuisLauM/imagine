@@ -4,28 +4,28 @@
 \alias{contextualMF}
 \title{Performs Contextual Median Filter}
 \usage{
-contextualMF(dataMatrix, inner_radius = 3, outer_radius = 5, x = 0.5,
+contextualMF(X, inner_radius = 3, outer_radius = 5, probs = 0.5,
   times = 1)
 }
 \arguments{
-\item{dataMatrix}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A \code{numeric matrix} object used for apply filters.}
 
 \item{inner_radius}{Size of the Inner squared kernel to apply median. Check Details.}
 
 \item{outer_radius}{Size of the Outer squared kernel to apply median. Check Details.}
 
-\item{x}{\code{numeric} vector of probabilities with values in [0,1].}
+\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 
 \item{times}{How many times do you want to apply the filter?}
 }
 \value{
-\code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+\code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{X}.
 }
 \description{
 This function performs a generalization of the Contextual Median Filter propose by
 Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but it allows
 the users to modify values like the inner/outer matrices (check the paper for extra information) as
-well as the quantile (as default, for median: \code{x = 0.5}) and the number of applications (\code{x}).
+well as the quantile (as default, for median: \code{probs = 0.5}) and the number of applications (\code{times}).
 }
 \examples{
 # Generate example matrix
@@ -35,7 +35,7 @@ nCols <- 100
 myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 
 # Make convolution
-myOutput <- contextualMF(dataMatrix = myMatrix)
+myOutput <- contextualMF(X = myMatrix)
 
 # Plot results
 image(myOutput, zlim = c(0, 100))

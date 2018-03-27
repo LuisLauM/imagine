@@ -6,28 +6,28 @@
 \alias{medianFilter}
 \title{Make a 2D filter calculations from numeric matrix}
 \usage{
-meanFilter(dataMatrix, radius, times = 1)
+meanFilter(X, radius, times = 1)
 
-quantileFilter(dataMatrix, radius, x, times = 1)
+quantileFilter(X, radius, probs, times = 1)
 
-medianFilter(dataMatrix, radius, times = 1)
+medianFilter(X, radius, times = 1)
 }
 \arguments{
-\item{dataMatrix}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A \code{numeric matrix} object used for apply filters.}
 
 \item{radius}{Size of squared kernel to apply median.}
 
 \item{times}{How many times do you want to apply the filter?}
 
-\item{x}{\code{numeric} vector of probabilities with values in [0,1].}
+\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
-\code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+\code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{X}.
 
 \code{quantileFilter} don't use a kernel but, for each cell, it returns the position
-of quantile 'x' (value between 0 and 1).
+of quantile 'probs' (value between 0 and 1).
 
-\code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5.
+\code{medianFilter} is a wrapper of \code{quantileFilter} with probs = 0.5.
 }
 \description{
 This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
@@ -35,7 +35,7 @@ the squared matrix of dimension \eqn{radius*radius}. Finally and according to th
 return for each cell the mean, median or the quantile of the weighted sum.
 }
 \details{
-Functions use C++ algorithms. More details are shown in vignette.
+Functions use C++ algorithms. More details are shown in the vignette.
 }
 \examples{
 # Generate example matrix

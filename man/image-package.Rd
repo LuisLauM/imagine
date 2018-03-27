@@ -10,7 +10,7 @@
 Provides fast application of image filters to data matrices, using R and C++ algorithms.
 }
 \details{
-This package uses C++ algorithms called 'engines'. More details are shown in vignette.
+This package uses C++ algorithms called 'engines'. More details are shown in the vignette.
 }
 \author{
 Wencheng Lau-Medrano, \email{luis.laum@gmail.com}

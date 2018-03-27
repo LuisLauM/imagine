@@ -6,31 +6,31 @@
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
-convolution2D(dataMatrix, kernel, times = 1, noNA = FALSE)
+convolution2D(X, kernel, times = 1, noNA = FALSE)
 
-convolutionQuantile(dataMatrix, kernel, x, times = 1)
+convolutionQuantile(X, kernel, probs, times = 1)
 
-convolutionMedian(dataMatrix, kernel, times = 1)
+convolutionMedian(X, kernel, times = 1)
 }
 \arguments{
-\item{dataMatrix}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A \code{numeric matrix} object used for apply filters.}
 
-\item{kernel}{A little matrix used as mask for each cell of \code{dataMatrix}.}
+\item{kernel}{A little matrix used as mask for each cell of \code{X}.}
 
 \item{times}{How many times do you want to apply the filter?}
 
 \item{noNA}{\code{logical} indicating whether to make convolution only if all values within
-kernel are no \code{NA}.}
+kernel are not \code{NA}.}
 
-\item{x}{\code{numeric} vector of probabilities with values in [0,1].}
+\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
-\code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+\code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{X}.
 
 \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
-of quantile 'x' (value between 0 and 1).
+of quantile 'probs' (value between 0 and 1).
 
-\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5.
+\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with probs = 0.5.
 }
 \description{
 This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
@@ -38,7 +38,7 @@ the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weig
 }
 \details{
 Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
-to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in vignette.
+to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in the vignette.
 }
 \examples{
 # Generate example matrix
@@ -50,7 +50,7 @@ kernel <- diag(3)
 
 # Make convolution
 myOutput1 <- convolution2D(myMatrix, kernel)
-myOutput2 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
+myOutput2 <- convolutionQuantile(myMatrix, kernel, probs = 0.7)
 
 # Plot results
 par(mfrow = c(2, 2))

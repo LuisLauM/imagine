@@ -13,9 +13,9 @@ NULL
 #'
 #' @rdname convolutions
 #'
-#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
-#' @param kernel A little matrix used as mask for each cell of \code{dataMatrix}.
-#' @param x \code{numeric} vector of probabilities with values in [0,1].
+#' @param X A \code{numeric matrix} object used for apply filters.
+#' @param kernel A little matrix used as mask for each cell of \code{X}.
+#' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #' @param noNA \code{logical} indicating whether to make convolution only if all values within
 #' kernel are not \code{NA}.
@@ -23,7 +23,7 @@ NULL
 #' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
 #' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
 #'
-#' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{X}.
 #'
 #' @details
 #' Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
@@ -41,21 +41,21 @@ NULL
 #'
 #' # Make convolution
 #' myOutput1 <- convolution2D(myMatrix, kernel)
-#' myOutput2 <- convolutionQuantile(myMatrix, kernel, x = 0.7)
+#' myOutput2 <- convolutionQuantile(myMatrix, kernel, probs = 0.7)
 #'
 #' # Plot results
 #' par(mfrow = c(2, 2))
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-convolution2D <- function(dataMatrix, kernel, times = 1, noNA = FALSE){
+convolution2D <- function(X, kernel, times = 1, noNA = FALSE){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, times = times, noNA = noNA)
+  checkedArgs <- list(X = X, kernel = kernel, times = times, noNA = noNA)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolution2D")
 
   # Apply filters
-  output <- checkedArgs$dataMatrix
+  output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
@@ -67,22 +67,22 @@ convolution2D <- function(dataMatrix, kernel, times = 1, noNA = FALSE){
 
 #' @rdname convolutions
 #' @return \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
-#' of quantile 'x' (value between 0 and 1).
+#' of quantile 'probs' (value between 0 and 1).
 #' @export
-convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
+convolutionQuantile <- function(X, kernel, probs, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, kernel = kernel, x = x, times = times)
+  checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolutionQuantile")
 
-  checkedArgs$x <- ceiling(checkedArgs$x*prod(dim(kernel))) - 1
+  checkedArgs$probs <- ceiling(checkedArgs$probs*prod(dim(kernel))) - 1
 
   # Apply filters
-  output <- checkedArgs$dataMatrix
+  output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine2(data = output, kernel = kernel, x = x))
+    output <- with(checkedArgs, engine2(data = output, kernel = kernel, probs = probs))
   }
 
   return(output)
@@ -90,11 +90,11 @@ convolutionQuantile <- function(dataMatrix, kernel, x, times = 1){
 
 
 #' @rdname convolutions
-#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with x = 0.5.
+#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with probs = 0.5.
 #' @export
-convolutionMedian <- function(dataMatrix, kernel, times = 1){
+convolutionMedian <- function(X, kernel, times = 1){
 
-  output <- convolutionQuantile(dataMatrix = dataMatrix, kernel = kernel, x = 0.5, times = times)
+  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
 
   return(output)
 }
@@ -104,16 +104,16 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 #'
 #' @rdname basic2DFilter
 #'
-#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
+#' @param X A \code{numeric matrix} object used for apply filters.
 #' @param radius Size of squared kernel to apply median.
-#' @param x \code{numeric} vector of probabilities with values in [0,1].
+#' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #'
 #' @description This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
 #' the squared matrix of dimension \eqn{radius*radius}. Finally and according to the type of function, they
 #' return for each cell the mean, median or the quantile of the weighted sum.
 #'
-#' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{X}.
 #'
 #' @details Functions use C++ algorithms. More details are shown in the vignette.
 #' @export
@@ -136,14 +136,14 @@ convolutionMedian <- function(dataMatrix, kernel, times = 1){
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
 #' image(myOutput3, zlim = c(0, 100))
-meanFilter <- function(dataMatrix, radius, times = 1){
+meanFilter <- function(X, radius, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, times = times)
+  checkedArgs <- list(X = X, radius = radius, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "meanFilter")
 
   # Apply filters
-  output <- checkedArgs$dataMatrix
+  output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
@@ -156,22 +156,22 @@ meanFilter <- function(dataMatrix, radius, times = 1){
 
 #' @rdname basic2DFilter
 #' @return \code{quantileFilter} don't use a kernel but, for each cell, it returns the position
-#' of quantile 'x' (value between 0 and 1).
+#' of quantile 'probs' (value between 0 and 1).
 #' @export
-quantileFilter <- function(dataMatrix, radius, x, times = 1){
+quantileFilter <- function(X, radius, probs, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, radius = radius, x = x, times = times)
+  checkedArgs <- list(X = X, radius = radius, probs = probs, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "quantileFilter")
 
-  checkedArgs$x <- ceiling(checkedArgs$x*radius^2) - 1
+  checkedArgs$probs <- ceiling(checkedArgs$probs*radius^2) - 1
 
   # Apply filters
-  output <- checkedArgs$dataMatrix
+  output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine4(data = output, radius = radius, x = x))
+    output <- with(checkedArgs, engine4(data = output, radius = radius, probs = probs))
   }
 
   return(output)
@@ -179,29 +179,29 @@ quantileFilter <- function(dataMatrix, radius, x, times = 1){
 
 
 #' @rdname basic2DFilter
-#' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with x = 0.5.
+#' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with probs = 0.5.
 #' @export
-medianFilter <- function(dataMatrix, radius, times = 1){
+medianFilter <- function(X, radius, times = 1){
 
-  output <- quantileFilter(dataMatrix = dataMatrix, radius = radius, x = 0.5, times = times)
+  output <- quantileFilter(X = X, radius = radius, probs = 0.5, times = times)
 
   return(output)
 }
 
 #' Performs Contextual Median Filter
 #'
-#' @param dataMatrix A \code{numeric matrix} object used for apply filters.
+#' @param X A \code{numeric matrix} object used for apply filters.
 #' @param inner_radius Size of the Inner squared kernel to apply median. Check Details.
 #' @param outer_radius Size of the Outer squared kernel to apply median. Check Details.
-#' @param x \code{numeric} vector of probabilities with values in [0,1].
+#' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #'
 #' @description This function performs a generalization of the Contextual Median Filter propose by
 #' Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but it allows
 #' the users to modify values like the inner/outer matrices (check the paper for extra information) as
-#' well as the quantile (as default, for median: \code{x = 0.5}) and the number of applications (\code{x}).
+#' well as the quantile (as default, for median: \code{probs = 0.5}) and the number of applications (\code{times}).
 #'
-#' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{dataMatrix}.
+#' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{X}.
 #' @export
 #'
 #' @examples
@@ -212,25 +212,25 @@ medianFilter <- function(dataMatrix, radius, times = 1){
 #' myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 #'
 #' # Make convolution
-#' myOutput <- contextualMF(dataMatrix = myMatrix)
+#' myOutput <- contextualMF(X = myMatrix)
 #'
 #' # Plot results
 #' image(myOutput, zlim = c(0, 100))
-contextualMF <- function(dataMatrix, inner_radius = 3, outer_radius = 5, x = 0.5, times = 1){
+contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(dataMatrix = dataMatrix, inner_radius = inner_radius, outer_radius = outer_radius,
-                      x = x, times = times)
+  checkedArgs <- list(X = X, inner_radius = inner_radius, outer_radius = outer_radius,
+                      probs = probs, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
 
-  checkedArgs$x <- ceiling(checkedArgs$x*inner_radius^2) - 1
+  checkedArgs$probs <- ceiling(checkedArgs$probs*inner_radius^2) - 1
 
   # Apply filters
-  output <- checkedArgs$dataMatrix
+  output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine5(data = output, I_radius = inner_radius, O_radius = outer_radius, x = x))
+    output <- with(checkedArgs, engine5(data = output, I_radius = inner_radius, O_radius = outer_radius, probs = probs))
   }
 
   return(output)

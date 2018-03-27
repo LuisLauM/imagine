@@ -45,7 +45,7 @@ origMatrix_withNA <- origMatrix
 origMatrix_withNA[sample(seq(n^2), 0.7*n^2, replace = FALSE)] <- NA
 
 # Apply filter
-newMatrix <- quantileFilter(dataMatrix = origMatrix_withNA, radius = 3, x = 0.1, times = 1)
+newMatrix <- quantileFilter(X = origMatrix_withNA, radius = 3, x = 0.1, times = 1)
 
 # Plot matrices for compare
 cols <- colorRampPalette(c("green3", "red4"))(n)

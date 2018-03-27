@@ -73,7 +73,7 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel, bool noNA){
 
 // ENGINE 2: Convolution with quantiles
 // [[Rcpp::export]]
-NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
+NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs){
 
   int nrows = data.nrow();
   int ncols = data.ncol();
@@ -111,8 +111,8 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double x){
         // Sort values
         miniMatrix.sort();
 
-        // Get value for position indicated by 'x'
-        emptyData(i, j) = miniMatrix[x];
+        // Get value for position indicated by 'probs'
+        emptyData(i, j) = miniMatrix[probs];
       }else{
         emptyData(i, j) = NA_REAL;
       }
@@ -170,7 +170,7 @@ NumericMatrix engine3(NumericMatrix data, int radius){
 
 // ENGINE 4: Quantile filter
 // [[Rcpp::export]]
-NumericMatrix engine4(NumericMatrix data, int radius, double x){
+NumericMatrix engine4(NumericMatrix data, int radius, double probs){
   int nrows = data.nrow();
   int ncols = data.ncol();
 
@@ -202,8 +202,8 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
         // Sort values
         miniMatrix.sort();
 
-        // Get value for position indicated by 'x'
-        emptyData(i, j) = miniMatrix[x];
+        // Get value for position indicated by 'probs'
+        emptyData(i, j) = miniMatrix[probs];
       }else{
         emptyData(i, j) = NA_REAL;
       }
@@ -216,7 +216,7 @@ NumericMatrix engine4(NumericMatrix data, int radius, double x){
 // ENGINE 5: Contextual Median Filter
 // Proposed by Belkin et al. (2009), doi:10.1016/j.jmarsys.2008.11.018
 // [[Rcpp::export]]
-NumericMatrix engine5(NumericMatrix data, double x, int I_radius, int O_radius){
+NumericMatrix engine5(NumericMatrix data, double probs, int I_radius, int O_radius){
   int nrows = data.nrow();
   int ncols = data.ncol();
 
@@ -293,7 +293,7 @@ NumericMatrix engine5(NumericMatrix data, double x, int I_radius, int O_radius){
                 I_miniMatrix.sort();
 
                 // Put the median value of the Inner miniMatrix
-                emptyData(i, j) = I_miniMatrix[x];
+                emptyData(i, j) = I_miniMatrix[probs];
               }else{
                 emptyData(i, j) = data(i, j);
               }

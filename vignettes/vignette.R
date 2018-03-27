@@ -19,8 +19,8 @@ library(imagine)
 #                    nrow = 3)
 #  
 #  # Apply filters
-#  convolutionExample  <- convolution2D(dataMatrix = wbImage, kernel = kernel1)
-#  convQuantileExample <- convolutionQuantile(dataMatrix = wbImage, kernel = kernel2, x = 0.1)
+#  convolutionExample  <- convolution2D(X = wbImage, kernel = kernel1)
+#  convQuantileExample <- convolutionQuantile(X = wbImage, kernel = kernel2, probs = 0.1)
 #  
 
 ## ---- message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
@@ -47,8 +47,8 @@ kernel2 <- matrix(c(-2, 0, 0,
                   nrow = 3)
 
 # Apply filters
-convolutionExample  <- convolution2D(dataMatrix = myMatrix, kernel = kernel1)
-convQuantileExample <- convolutionQuantile(dataMatrix = myMatrix, kernel = kernel2, x = 0.1)
+convolutionExample  <- convolution2D(X = myMatrix, kernel = kernel1)
+convQuantileExample <- convolutionQuantile(X = myMatrix, kernel = kernel2, probs = 0.1)
 
 # Make plots
 par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(2, 1))
@@ -69,9 +69,9 @@ mtext(text = "2D quantile convolution", side = 1, line = -1.5, col = "white", fo
 #  radius <- 3
 #  
 #  # Apply filters
-#  meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
-#  quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
-#  medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius, times = 10)
+#  meanfilterExample     <- meanFilter(X = myMatrix, radius = radius)
+#  quantilefilterExample <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
+#  medianfilterExample   <- medianFilter(X = myMatrix, radius = radius, times = 10)
 #  
 
 ## ---- message=FALSE, fig.height=3, fig.width=5.33, fig.cap = "Figure 2: Original matrix", results='hide', fig.pos="h", echo=FALSE----
@@ -95,9 +95,9 @@ myMatrix[naIndex] <- NA
 radius <- 3
 
 # Apply filters
-meanfilterExample     <- meanFilter(dataMatrix = myMatrix, radius = radius)
-quantilefilterExample <- quantileFilter(dataMatrix = myMatrix, radius = radius, x = 0.1)
-medianfilterExample   <- medianFilter(dataMatrix = myMatrix, radius = radius, times = 10)
+meanfilterExample     <- meanFilter(X = myMatrix, radius = radius)
+quantilefilterExample <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
+medianfilterExample   <- medianFilter(X = myMatrix, radius = radius, times = 10)
 
 # Make plots
 par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(3, 1))
