@@ -40,3 +40,8 @@ myOutput <- contextualMF(X = myMatrix)
 # Plot results
 image(myOutput, zlim = c(0, 100))
 }
+\references{
+Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front detection in chlorophyll
+and SST satellite imagery. Journal of Marine Systems, 78(3), 319-326
+(\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+}

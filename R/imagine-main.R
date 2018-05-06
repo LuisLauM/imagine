@@ -201,6 +201,10 @@ medianFilter <- function(X, radius, times = 1){
 #' the users to modify values like the inner/outer matrices (check the paper for extra information) as
 #' well as the quantile (as default, for median: \code{probs = 0.5}) and the number of applications (\code{times}).
 #'
+#' @references Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front detection in chlorophyll
+#' and SST satellite imagery. Journal of Marine Systems, 78(3), 319-326
+#' (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+#'
 #' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{X}.
 #' @export
 #'
