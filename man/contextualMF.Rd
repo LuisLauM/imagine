@@ -5,7 +5,7 @@
 \title{Performs Contextual Median Filter}
 \usage{
 contextualMF(X, inner_radius = 3, outer_radius = 5, probs = 0.5,
-  times = 1)
+  times = 1, na = NA)
 }
 \arguments{
 \item{X}{A \code{numeric matrix} object used for apply filters.}
@@ -17,15 +17,23 @@ contextualMF(X, inner_radius = 3, outer_radius = 5, probs = 0.5,
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 
 \item{times}{How many times do you want to apply the filter?}
+
+\item{na}{\code{NA} as default. But, if specified, it must be an integer value higher
+than the maximum of \code{X}.}
 }
 \value{
-\code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{X}.
+\code{contextualMF} returns a \code{matrix} object with the same dimensions
+of \code{X}.
 }
 \description{
-This function performs a generalization of the Contextual Median Filter propose by
-Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but it allows
-the users to modify values like the inner/outer matrices (check the paper for extra information) as
-well as the quantile (as default, for median: \code{probs = 0.5}) and the number of applications (\code{times}).
+This function performs a generalization of the Contextual Median Filter
+propose by Belkin & O'Reilly (2009). The default parameters reproduce the algorithm
+of the paper, but the function allows certain customization (see Details).
+}
+\details{
+The users can change some arguments like the big and small window matrices (3x3 and
+5x5, respectively in the original paper) as well as the quantile to search (median
+as default, i.e. \code{probs = 0.5}) and the number of applications (\code{times = 1}).
 }
 \examples{
 # Generate example matrix
@@ -41,7 +49,7 @@ myOutput <- contextualMF(X = myMatrix)
 image(myOutput, zlim = c(0, 100))
 }
 \references{
-Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front detection in chlorophyll
-and SST satellite imagery. Journal of Marine Systems, 78(3), 319-326
-(\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
+detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
+319-326 (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
 }

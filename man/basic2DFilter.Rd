@@ -8,9 +8,9 @@
 \usage{
 meanFilter(X, radius, times = 1)
 
-quantileFilter(X, radius, probs, times = 1)
+quantileFilter(X, radius, probs, times = 1, na = NA)
 
-medianFilter(X, radius, times = 1)
+medianFilter(X, radius, times = 1, na = NA)
 }
 \arguments{
 \item{X}{A \code{numeric matrix} object used for apply filters.}
@@ -20,19 +20,23 @@ medianFilter(X, radius, times = 1)
 \item{times}{How many times do you want to apply the filter?}
 
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
+
+\item{na}{\code{NA} as default. But, if specified, it must be an integer value higher
+than the maximum of \code{X}.}
 }
 \value{
-\code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{X}.
+A \code{matrix} object with the same dimensions of \code{X}.
 
-\code{quantileFilter} don't use a kernel but, for each cell, it returns the position
+\code{quantileFilter} don't use a kernel but, for each cell, it returns
+the position
 of quantile 'probs' (value between 0 and 1).
 
 \code{medianFilter} is a wrapper of \code{quantileFilter} with probs = 0.5.
 }
 \description{
-This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
-the squared matrix of dimension \eqn{radius*radius}. Finally and according to the type of function, they
-return for each cell the mean, median or the quantile of the weighted sum.
+This functions take a \code{matrix} object, and for each cell calculate
+mean, median or certain quantile about a squared neighborhood by matrix of dimension
+(\eqn{radius*radius}).
 }
 \details{
 Functions use C++ algorithms. More details are shown in the vignette.
@@ -46,13 +50,14 @@ myMatrix <- matrix(runif(nRows*nCols, 0, 100), nrow = nRows, ncol = nCols)
 radius <- 3
 
 # Make convolution
-myOutput1 <- meanFilter(myMatrix, radius)
-myOutput2 <- quantileFilter(myMatrix, radius, 0.1)
-myOutput3 <- medianFilter(myMatrix, radius)
+myOutput1 <- meanFilter(X = myMatrix, radius = radius)
+myOutput2 <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
+myOutput3 <- medianFilter(X = myMatrix, radius = radius)
 
 # Plot results
-image(myMatrix, zlim = c(0, 100))
-image(myOutput1, zlim = c(0, 100))
-image(myOutput2, zlim = c(0, 100))
-image(myOutput3, zlim = c(0, 100))
+par(mfrow = c(2, 2))
+image(myMatrix, zlim = c(0, 100), title = "Original")
+image(myOutput1, zlim = c(0, 100), title = "meanFilter")
+image(myOutput2, zlim = c(0, 100), title = "quantileFilter")
+image(myOutput3, zlim = c(0, 100), title = "medianFilter")
 }

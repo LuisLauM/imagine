@@ -6,11 +6,11 @@
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
-convolution2D(X, kernel, times = 1, noNA = FALSE)
+convolution2D(X, kernel, times = 1)
 
-convolutionQuantile(X, kernel, probs, times = 1)
+convolutionQuantile(X, kernel, probs, times = 1, na = NA)
 
-convolutionMedian(X, kernel, times = 1)
+convolutionMedian(X, kernel, times = 1, na = NA)
 }
 \arguments{
 \item{X}{A \code{numeric matrix} object used for apply filters.}
@@ -19,26 +19,31 @@ convolutionMedian(X, kernel, times = 1)
 
 \item{times}{How many times do you want to apply the filter?}
 
-\item{noNA}{\code{logical} indicating whether to make convolution only if all values within
-kernel are not \code{NA}.}
-
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
+
+\item{na}{\code{NA} as default. But, if specified, it must be an integer value higher
+than the maximum of \code{X}.}
 }
 \value{
-\code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{X}.
+\code{convolution2D} returns a \code{matrix} object with the same dimensions
+of \code{X}.
 
-\code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
+\code{convolutionQuantile} uses the kernel but, for each cell, it returns
+the position
 of quantile 'probs' (value between 0 and 1).
 
-\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with probs = 0.5.
+\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with
+probs = 0.5.
 }
 \description{
-This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
+This function takes a \code{matrix} object, and for each cell multiplies
+its neighborhood by the \code{kernel}. Finally, it returns for each cell the mean of
+the kernel-weighted sum.
 }
 \details{
-Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
-to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in the vignette.
+Convolution is a  mathematical operation which allows the multiplication of two arrays
+of numbers, in order to produce an array of numbers of the same dimensionality.
+Functions use C++ algorithms. More details are shown in the vignette.
 }
 \examples{
 # Generate example matrix

@@ -17,17 +17,20 @@ NULL
 #' @param kernel A little matrix used as mask for each cell of \code{X}.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
-#' @param noNA \code{logical} indicating whether to make convolution only if all values within
-#' kernel are not \code{NA}.
+#' @param na \code{NA} as default. But, if specified, it must be an integer value higher
+#' than the maximum of \code{X}.
 #'
-#' @description This function takes a \code{matrix} object, and for each cell multiplies its neighborhood by
-#' the \code{kernel}. Finally, it returns for each cell the mean of the kernel-weighted sum.
+#' @description This function takes a \code{matrix} object, and for each cell multiplies
+#' its neighborhood by the \code{kernel}. Finally, it returns for each cell the mean of
+#' the kernel-weighted sum.
 #'
-#' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions of \code{X}.
+#' @return \code{convolution2D} returns a \code{matrix} object with the same dimensions
+#' of \code{X}.
 #'
 #' @details
-#' Convolution is a  mathematical operation which allows the multiplication of two arrays of numbers, in order
-#' to produce an array of numbers of the same dimensionality. Functions use C++ algorithms. More details are shown in the vignette.
+#' Convolution is a  mathematical operation which allows the multiplication of two arrays
+#' of numbers, in order to produce an array of numbers of the same dimensionality.
+#' Functions use C++ algorithms. More details are shown in the vignette.
 #'
 #' @export
 #'
@@ -48,10 +51,10 @@ NULL
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-convolution2D <- function(X, kernel, times = 1, noNA = FALSE){
+convolution2D <- function(X, kernel, times = 1){
 
   # Check and validation of arguments
-  checkedArgs <- list(X = X, kernel = kernel, times = times, noNA = noNA)
+  checkedArgs <- list(X = X, kernel = kernel, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolution2D")
 
   # Apply filters
@@ -59,42 +62,52 @@ convolution2D <- function(X, kernel, times = 1, noNA = FALSE){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine1(data = output, kernel = kernel, noNA = noNA))
+    output <- with(checkedArgs, engine1(data = output, kernel = kernel))
   }
 
   return(output)
 }
 
 #' @rdname convolutions
-#' @return \code{convolutionQuantile} uses the kernel but, for each cell, it returns the position
+#' @return \code{convolutionQuantile} uses the kernel but, for each cell, it returns
+#' the position
 #' of quantile 'probs' (value between 0 and 1).
 #' @export
-convolutionQuantile <- function(X, kernel, probs, times = 1){
+convolutionQuantile <- function(X, kernel, probs, times = 1, na = NA){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolutionQuantile")
-
-  checkedArgs$probs <- ceiling(checkedArgs$probs*prod(dim(kernel))) - 1
 
   # Apply filters
   output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine2(data = output, kernel = kernel, probs = probs))
+    output <- with(checkedArgs,
+                   engine2(data = output, kernel = kernel, probs = probs, naVal = naVal))
+
+    if(i < checkedArgs$times){
+      # Replace NA
+      output[is.na(output)] <- checkedArgs$naVal
+    }
   }
+
+  # Replace NA with the defined value in args
+  output[is.na(output)] <- checkedArgs$na
 
   return(output)
 }
 
 
 #' @rdname convolutions
-#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with probs = 0.5.
+#' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with
+#' probs = 0.5.
 #' @export
-convolutionMedian <- function(X, kernel, times = 1){
+convolutionMedian <- function(X, kernel, times = 1, na = NA){
 
-  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
+  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times,
+                                na = na)
 
   return(output)
 }
@@ -108,12 +121,14 @@ convolutionMedian <- function(X, kernel, times = 1){
 #' @param radius Size of squared kernel to apply median.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
+#' @param na \code{NA} as default. But, if specified, it must be an integer value higher
+#' than the maximum of \code{X}.
 #'
-#' @description This functions take a \code{matrix} object, and for each cell multiplies its neighborhood by
-#' the squared matrix of dimension \eqn{radius*radius}. Finally and according to the type of function, they
-#' return for each cell the mean, median or the quantile of the weighted sum.
+#' @description This functions take a \code{matrix} object, and for each cell calculate
+#' mean, median or certain quantile about a squared neighborhood by matrix of dimension
+#' (\eqn{radius*radius}).
 #'
-#' @return \code{meanFilter} returns a \code{matrix} object with the same dimensions of \code{X}.
+#' @return A \code{matrix} object with the same dimensions of \code{X}.
 #'
 #' @details Functions use C++ algorithms. More details are shown in the vignette.
 #' @export
@@ -127,15 +142,16 @@ convolutionMedian <- function(X, kernel, times = 1){
 #' radius <- 3
 #'
 #' # Make convolution
-#' myOutput1 <- meanFilter(myMatrix, radius)
-#' myOutput2 <- quantileFilter(myMatrix, radius, 0.1)
-#' myOutput3 <- medianFilter(myMatrix, radius)
+#' myOutput1 <- meanFilter(X = myMatrix, radius = radius)
+#' myOutput2 <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
+#' myOutput3 <- medianFilter(X = myMatrix, radius = radius)
 #'
 #' # Plot results
-#' image(myMatrix, zlim = c(0, 100))
-#' image(myOutput1, zlim = c(0, 100))
-#' image(myOutput2, zlim = c(0, 100))
-#' image(myOutput3, zlim = c(0, 100))
+#' par(mfrow = c(2, 2))
+#' image(myMatrix, zlim = c(0, 100), title = "Original")
+#' image(myOutput1, zlim = c(0, 100), title = "meanFilter")
+#' image(myOutput2, zlim = c(0, 100), title = "quantileFilter")
+#' image(myOutput3, zlim = c(0, 100), title = "medianFilter")
 meanFilter <- function(X, radius, times = 1){
 
   # Check and validation of arguments
@@ -155,24 +171,32 @@ meanFilter <- function(X, radius, times = 1){
 
 
 #' @rdname basic2DFilter
-#' @return \code{quantileFilter} don't use a kernel but, for each cell, it returns the position
+#' @return \code{quantileFilter} don't use a kernel but, for each cell, it returns
+#' the position
 #' of quantile 'probs' (value between 0 and 1).
 #' @export
-quantileFilter <- function(X, radius, probs, times = 1){
+quantileFilter <- function(X, radius, probs, times = 1, na = NA){
 
   # Check and validation of arguments
-  checkedArgs <- list(X = X, radius = radius, probs = probs, times = times)
+  checkedArgs <- list(X = X, radius = radius, probs = probs, times = times, na = na)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "quantileFilter")
-
-  checkedArgs$probs <- ceiling(checkedArgs$probs*radius^2) - 1
 
   # Apply filters
   output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine4(data = output, radius = radius, probs = probs))
+    output <- with(checkedArgs,
+                   engine4(data = output, radius = radius, probs = probs, naVal = naVal))
+
+    if(i < checkedArgs$times){
+      # Replace NA
+      output[is.na(output)] <- checkedArgs$naVal
+    }
   }
+
+  # Replace NA with the defined value in args
+  output[is.na(output)] <- checkedArgs$na
 
   return(output)
 }
@@ -181,9 +205,10 @@ quantileFilter <- function(X, radius, probs, times = 1){
 #' @rdname basic2DFilter
 #' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with probs = 0.5.
 #' @export
-medianFilter <- function(X, radius, times = 1){
+medianFilter <- function(X, radius, times = 1, na = NA){
 
-  output <- quantileFilter(X = X, radius = radius, probs = 0.5, times = times)
+  output <- quantileFilter(X = X, radius = radius, probs = 0.5, times = times,
+                           na = na)
 
   return(output)
 }
@@ -195,17 +220,24 @@ medianFilter <- function(X, radius, times = 1){
 #' @param outer_radius Size of the Outer squared kernel to apply median. Check Details.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
+#' @param na \code{NA} as default. But, if specified, it must be an integer value higher
+#' than the maximum of \code{X}.
 #'
-#' @description This function performs a generalization of the Contextual Median Filter propose by
-#' Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but it allows
-#' the users to modify values like the inner/outer matrices (check the paper for extra information) as
-#' well as the quantile (as default, for median: \code{probs = 0.5}) and the number of applications (\code{times}).
+#' @description This function performs a generalization of the Contextual Median Filter
+#' propose by Belkin & O'Reilly (2009). The default parameters reproduce the algorithm
+#' of the paper, but the function allows certain customization (see Details).
 #'
-#' @references Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front detection in chlorophyll
-#' and SST satellite imagery. Journal of Marine Systems, 78(3), 319-326
-#' (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+#' @details
+#' The users can change some arguments like the big and small window matrices (3x3 and
+#' 5x5, respectively in the original paper) as well as the quantile to search (median
+#' as default, i.e. \code{probs = 0.5}) and the number of applications (\code{times = 1}).
 #'
-#' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions of \code{X}.
+#' @references Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
+#' detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
+#' 319-326 (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+#'
+#' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions
+#' of \code{X}.
 #' @export
 #'
 #' @examples
@@ -220,22 +252,32 @@ medianFilter <- function(X, radius, times = 1){
 #'
 #' # Plot results
 #' image(myOutput, zlim = c(0, 100))
-contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, times = 1){
+contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, times = 1,
+                         na = NA){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X, inner_radius = inner_radius, outer_radius = outer_radius,
-                      probs = probs, times = times)
+                      probs = probs, times = times, na = na)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
-
-  checkedArgs$probs <- ceiling(checkedArgs$probs*inner_radius^2) - 1
 
   # Apply filters
   output <- checkedArgs$X
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine5(data = output, I_radius = inner_radius, O_radius = outer_radius, probs = probs))
+    # Apply filter
+    output <- with(checkedArgs,
+                   engine5(data = output, I_radius = inner_radius, O_radius = outer_radius,
+                           probs = probs, naVal = naVal))
+
+    if(i < checkedArgs$times){
+      # Replace NA
+      output[is.na(output)] <- checkedArgs$naVal
+    }
   }
+
+  # Replace NA with the defined value in args
+  output[is.na(output)] <- checkedArgs$na
 
   return(output)
 }
@@ -243,8 +285,8 @@ contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, tim
 
 #' @title Data matrix to be used as example image.
 #' @name wbImage
-#' @description \code{matrix} object containig numeric data to plot a image. The photo was taken
-#' by the author at 2016.
+#' @description \code{matrix} object containig numeric data to plot a image. The photo
+#' was taken by the author at 2016.
 #' @aliases wbImage
 #' @docType data
 #' @usage wbImage

@@ -17,13 +17,12 @@ checkArgs_convolution2D <- function(allArgs){
   X <- allArgs$X
   kernel <- allArgs$kernel
   times <- allArgs$times
-  noNA <- allArgs$noNA
 
-  if(class(X) != "matrix" || mode(X) != "numeric"){
+  if(!is.matrix(X) || !is.numeric(X)){
     stop("'datMatrix' must be a numeric matrix.")
   }
 
-  if(class(kernel) != "matrix" || mode(kernel) != "numeric"){
+  if(!is.matrix(kernel) || !is.numeric(kernel)){
     stop("'kernel' must be a numeric matrix.")
   }
 
@@ -31,18 +30,13 @@ checkArgs_convolution2D <- function(allArgs){
     stop("Dimensions of 'kernel' matrix must be less than the 'X'.")
   }
 
-  kernel <- matrix(data = round(an(kernel), 0), nrow = nrow(kernel))
-
-  if(length(times) != 1 || mode(times) != "numeric"){
+  if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")
   }
 
-  times <- as.integer(times)
-
-  if(!is.logical(noNA)){
-    noNA <- isTRUE(noNA)
-
-    warning("Given 'noNA' was not logical. Default value (FALSE) was taken.")
+  if(!isTRUE(all.equal(times, as.integer(times)))){
+    warning("'times' must be an integer number. It will be coerced as integer.")
+    allArgs$times <- as.integer(allArgs$times)
   }
 
   return(allArgs)
@@ -54,12 +48,13 @@ checkArgs_convolutionQuantile <- function(allArgs){
   kernel <- allArgs$kernel
   probs <- allArgs$probs
   times <- allArgs$times
+  na <- allArgs$na
 
-  if(class(X) != "matrix" || mode(X) != "numeric"){
+  if(!is.matrix(X) || !is.numeric(X)){
     stop("'datMatrix' must be a numeric matrix.")
   }
 
-  if(class(kernel) != "matrix" || mode(kernel) != "numeric"){
+  if(!is.matrix(kernel) || !is.numeric(kernel)){
     stop("'kernel' must be a numeric matrix.")
   }
 
@@ -67,17 +62,41 @@ checkArgs_convolutionQuantile <- function(allArgs){
     stop("Dimensions of 'kernel' matrix must be less than the 'X'.")
   }
 
-  kernel <- matrix(data = round(an(kernel), 0), nrow = nrow(kernel))
-
-  if(class(probs) != "numeric" || length(probs) != 1 || probs < 0 || probs > 1){
+  if(!is.numeric(probs) || length(probs) != 1 || probs < 0 || probs > 1){
     stop("'probs' must be a numeric between 0 and 1 with length = 1.")
   }
 
-  if(length(times) != 1 || mode(times) != "numeric"){
+  if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")
   }
 
-  times <- as.integer(times)
+  if(!isTRUE(all.equal(times, as.integer(times)))){
+    warning("'times' must be an integer number. It will be coerced as integer.")
+    allArgs$times <- as.integer(allArgs$times)
+  }
+
+  if(!is.na(na)){
+    if(sum(is.na(X)) > 0){
+      stop("If 'na' has been set as a value, 'X' must not contain any NA.")
+    }
+
+    if(length(na) != 1 || !is.numeric(na)){
+      stop("'na' must be set whether as NA or as a numeric value of length 1.")
+    }
+
+    if(max(X, na.rm = TRUE) >= as.integer(na)){
+      stop("'na' value must be an integer value higher than max(X).")
+    }
+
+    if(!isTRUE(all.equal(na, as.integer(na)))){
+      warning("'na' must be an integer number. It will be coerced as integer.")
+    }
+
+    allArgs$naVal <- as.integer(allArgs$na)
+  }else{
+    allArgs$naVal <- as.integer(ceiling(max(X, na.rm = TRUE)) + 1)
+    allArgs$X[is.na(allArgs$X)] <- allArgs$naVal
+  }
 
   return(allArgs)
 }
@@ -88,11 +107,11 @@ checkArgs_meanFilter <- function(allArgs){
   radius <- allArgs$radius
   times <- allArgs$times
 
-  if(class(X) != "matrix" || mode(X) != "numeric"){
+  if(!is.matrix(X) || !is.numeric(X)){
     stop("'datMatrix' must be a numeric matrix.")
   }
 
-  if(length(radius) != 1 || mode(radius) != "numeric"){
+  if(length(radius) != 1 || !is.numeric(radius)){
     stop("'radius' must be a numeric vector of length 1.")
   }
 
@@ -100,10 +119,18 @@ checkArgs_meanFilter <- function(allArgs){
     stop("'radius' must be less than the dimensions (number of row and columns) of 'X'.")
   }
 
-  radius <- as.integer(radius)
+  if(!isTRUE(all.equal(radius, as.integer(radius)))){
+    warning("'radius' must be an integer number. It will be coerced as integer.")
+    allArgs$radius <- as.integer(allArgs$radius)
+  }
 
-  if(length(times) != 1 || mode(times) != "numeric"){
+  if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")
+  }
+
+  if(!isTRUE(all.equal(times, as.integer(times)))){
+    warning("'times' must be an integer number. It will be coerced as integer.")
+    allArgs$times <- as.integer(allArgs$times)
   }
 
   times <- as.integer(times)
@@ -117,30 +144,60 @@ checkArgs_quantileFilter <- function(allArgs){
   radius <- allArgs$radius
   probs <- allArgs$probs
   times <- allArgs$times
+  na <- allArgs$na
 
-  if(class(X) != "matrix" || mode(X) != "numeric"){
+  if(!is.matrix(X) || !is.numeric(X)){
     stop("'datMatrix' must be a numeric matrix.")
   }
 
-  if(length(radius) != 1 || mode(radius) != "numeric"){
+  if(length(radius) != 1 || !is.numeric(radius)){
     stop("'radius' must be a numeric vector of length 1.")
+  }
+
+  if(!isTRUE(all.equal(radius, as.integer(radius)))){
+    warning("'radius' must be an integer number. It will be coerced as integer.")
+    allArgs$radius <- as.integer(allArgs$radius)
   }
 
   if(radius > nrow(X) || radius > ncol(X)){
     stop("'radius' must be less than the dimensions (number of row and columns) of 'X'.")
   }
 
-  radius <- as.integer(radius)
-
-  if(class(probs) != "numeric" || length(probs) != 1 || probs < 0 || probs > 1){
+  if(!is.numeric(probs) || length(probs) != 1 || probs < 0 || probs > 1){
     stop("'probs' must be a numeric between 0 and 1 with length = 1.")
   }
 
-  if(length(times) != 1 || mode(times) != "numeric"){
+  if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")
   }
 
-  times <- as.integer(times)
+  if(!isTRUE(all.equal(times, as.integer(times)))){
+    warning("'times' must be an integer number. It will be coerced as integer.")
+    allArgs$times <- as.integer(allArgs$times)
+  }
+
+  if(!is.na(na)){
+    if(sum(is.na(X)) > 0){
+      stop("If 'na' has been set as a value, 'X' must not contain any NA.")
+    }
+
+    if(length(na) != 1 || !is.numeric(na)){
+      stop("'na' must be set whether as NA or as a numeric value of length 1.")
+    }
+
+    if(max(X, na.rm = TRUE) >= as.integer(na)){
+      stop("'na' value must be an integer value higher than max(X).")
+    }
+
+    if(!isTRUE(all.equal(na, as.integer(na)))){
+      warning("'na' must be an integer number. It will be coerced as integer.")
+    }
+
+    allArgs$naVal <- as.integer(allArgs$na)
+  }else{
+    allArgs$naVal <- as.integer(ceiling(max(X, na.rm = TRUE)) + 1)
+    allArgs$X[is.na(allArgs$X)] <- allArgs$naVal
+  }
 
   return(allArgs)
 }
@@ -151,13 +208,14 @@ checkArgs_contextualMF <- function(allArgs){
   outer_radius <- allArgs$outer_radius
   probs <- allArgs$probs
   times <- allArgs$times
+  na <- allArgs$na
 
-  if(class(X) != "matrix" || mode(X) != "numeric"){
-    stop("'datMatrix' must be a numeric matrix.")
+  if(!is.matrix(X) || !is.numeric(X)){
+    stop("'X' must be a numeric matrix.")
   }
 
-  if(length(inner_radius) != 1 || mode(inner_radius) != "numeric" ||
-     length(outer_radius) != 1 || mode(outer_radius) != "numeric"){
+  if(length(inner_radius) != 1 || !is.numeric(inner_radius) ||
+     length(outer_radius) != 1 || !is.numeric(outer_radius)){
     stop("'outer_radius' and 'inner_radius' must be numeric vectors of length 1.")
   }
 
@@ -170,18 +228,47 @@ checkArgs_contextualMF <- function(allArgs){
     stop("'outer_radius' must be greater than 'inner_radius'.")
   }
 
-  inner_radius <- as.integer(inner_radius)
-  outer_radius <- as.integer(outer_radius)
-
-  if(class(probs) != "numeric" || length(probs) != 1 || probs < 0 || probs > 1){
-    stop("'probs' must be a numeric between 0 and 1 with length = 1.")
+  if(!isTRUE(all.equal(inner_radius, as.integer(inner_radius))) || !isTRUE(all.equal(outer_radius, as.integer(outer_radius)))){
+    warning("'inner_radius' and 'outer_radius' must be integer numbers. They will be coerced as integers.")
+    inner_radius <- as.integer(inner_radius)
+    outer_radius <- as.integer(outer_radius)
   }
 
-  if(length(times) != 1 || mode(times) != "numeric"){
+  if(!is.numeric(probs) || length(probs) != 1 || probs < 0 || probs > 1){
+    stop("'probs' must be a numeric vector with values between 0 and 1 with length = 1.")
+  }
+
+  if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")
   }
 
-  times <- as.integer(times)
+  if(!isTRUE(all.equal(times, as.integer(times)))){
+    warning("'times' must be an integer number. It will be coerced as integer.")
+    allArgs$times <- as.integer(allArgs$times)
+  }
+
+  if(!is.na(na)){
+    if(sum(is.na(X)) > 0){
+      stop("If 'na' has been set as a value, 'X' must not contain any NA.")
+    }
+
+    if(length(na) != 1 || !is.numeric(na)){
+      stop("'na' must be set whether as NA or as a numeric value of length 1.")
+    }
+
+    if(max(X, na.rm = TRUE) >= as.integer(na)){
+      stop("'na' value must be an integer value higher than max(X).")
+    }
+
+    if(!isTRUE(all.equal(na, as.integer(na)))){
+      warning("'na' must be an integer number. It will be coerced as integer.")
+    }
+
+    allArgs$naVal <- as.integer(allArgs$na)
+  }else{
+    allArgs$naVal <- as.integer(ceiling(max(X, na.rm = TRUE)) + 1)
+    allArgs$X[is.na(allArgs$X)] <- allArgs$naVal
+  }
 
   return(allArgs)
 }
