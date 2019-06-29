@@ -19,7 +19,7 @@ checkArgs_convolution2D <- function(allArgs){
   times <- allArgs$times
 
   if(!is.matrix(X) || !is.numeric(X)){
-    stop("'datMatrix' must be a numeric matrix.")
+    stop("'X' must be a numeric matrix.")
   }
 
   if(!is.matrix(kernel) || !is.numeric(kernel)){
@@ -51,7 +51,11 @@ checkArgs_convolutionQuantile <- function(allArgs){
   na <- allArgs$na
 
   if(!is.matrix(X) || !is.numeric(X)){
-    stop("'datMatrix' must be a numeric matrix.")
+    stop("'X' must be a numeric matrix.")
+  }
+
+  if(any(is.na(kernel))){
+    stop("'kernel' must not have NA inside.")
   }
 
   if(!is.matrix(kernel) || !is.numeric(kernel)){
@@ -108,7 +112,7 @@ checkArgs_meanFilter <- function(allArgs){
   times <- allArgs$times
 
   if(!is.matrix(X) || !is.numeric(X)){
-    stop("'datMatrix' must be a numeric matrix.")
+    stop("'X' must be a numeric matrix.")
   }
 
   if(length(radius) != 1 || !is.numeric(radius)){
@@ -147,7 +151,7 @@ checkArgs_quantileFilter <- function(allArgs){
   na <- allArgs$na
 
   if(!is.matrix(X) || !is.numeric(X)){
-    stop("'datMatrix' must be a numeric matrix.")
+    stop("'X' must be a numeric matrix.")
   }
 
   if(length(radius) != 1 || !is.numeric(radius)){

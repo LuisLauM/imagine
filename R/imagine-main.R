@@ -76,7 +76,7 @@ convolution2D <- function(X, kernel, times = 1){
 convolutionQuantile <- function(X, kernel, probs, times = 1, na = NA){
 
   # Check and validation of arguments
-  checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times)
+  checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times, na = na)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolutionQuantile")
 
   # Apply filters

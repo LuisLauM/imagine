@@ -17,9 +17,9 @@ library(imagine)
 
 **IMAGing engINE, Tools for Application of Image Filters to Data Matrices**
 
-This package was built to take numeric data matrices and apply image-filtering algoriths.
+This package was built up to take numeric data matrices and apply image-filtering algoriths.
 
-Algoriths used by `imagine` include median-filter and 2D-convolution based algoriths implemented on Rcpp (C++) due to the high intensiveness and time expensiveness in the application of this filters to large numeric matrices.
+Algoriths used by `imagine` include median-filter and 2D-convolution based algoriths performed on Rcpp (C++) in order to speed up the application of this filters to large numeric matrices.
 
 
 ## Installation
@@ -31,16 +31,17 @@ install.packages("imagine")
 ```
 
 ## Engines
-`imagine` performs algorithms written in Rcpp (called 'engines'), ensuring a faster application of filters. At version 1.2.2, `imagine` include four main engines, described as follows:
+`imagine` performs algorithms written in Rcpp (called 'engines'), ensuring a faster application of filters. At version 1.5.0, `imagine` includes four main engines, described as follows:
 
 * Engine 1: Basic 2D-convolution algorithm. It multiplies kernel by the neighborhood of each cell and then it sums all values.
 * Engine 2: Make the same of Engine 1 but, at the end, it returns the position indicated by the parameter `probs`.
 * Engine 3: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and calculates the mean.
 * Engine 4: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and returns the position indicated by the parameter `probs`
+* Engine 5: It performs a generalization of the Contextual Median Filter propose by Belkin & O'Reilly (2009). The default parameters reproduce the algorithm of the paper, but the function allows certain customization.
 
 ## Main functions
 
-There are 4 main functions and 2 wrappers:
+There are 5 main functions and 2 wrappers:
 
 ### Convolution functions
 ```{r, eval=FALSE}
@@ -63,7 +64,7 @@ convQuantileExample <- convolutionQuantile(X = wbImage, kernel = kernel2, probs 
 
 ```
 
-For compare results, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
+In order to compare results, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
 
 **Original**
 
@@ -105,7 +106,7 @@ image(convolutionExample, col = cols, axes = FALSE)
 mtext(text = "2D convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
 image(convQuantileExample, col = cols, axes = FALSE)
-mtext(text = "2D quantile convolution", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+mtext(text = "2D quantile convolution", side = 1, line = -1.5, col = "black", font = 2, adj = 0.99)
 ```
 
 
@@ -126,7 +127,7 @@ medianfilterExample   <- medianFilter(X = myMatrix, radius = radius, times = 10)
 
 ```
 
-For compare results, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
+Now, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
 
 **Original**
 
@@ -168,7 +169,7 @@ mtext(text = "Mean filter", side = 1, line = -1.5, col = "white", font = 2, adj 
 
 # quantilefilterExample[quantilefilterExample < 0] <- 0
 image(quantilefilterExample, col = cols, axes = FALSE)
-mtext(text = "Quantile filter", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
+mtext(text = "Quantile filter (probs = 0.1)", side = 1, line = -1.5, col = "white", font = 2, adj = 0.99)
 
 # medianfilterExample[medianfilterExample < 0] <- 0
 image(medianfilterExample, col = cols, axes = FALSE)
@@ -177,51 +178,4 @@ mtext(text = "2D median filter", side = 1, line = -1.5, col = "white", font = 2,
 
 ## Kernel application
 
-In the field of image processing, one of the tools most commonly used are the **convolutions**, which consist of operations between two arrays: The array of image data (as a big matrix) and kernels (as small matrices) which weighs each pixel values by the values of its corresponding neighborhood. Different kernels produce different effects, for instance: blur, shifted images (right, left, up or down), sharpening, etc.
-
-The users must be cautious with the size of the kernel because the larger the radius, the more pixels remain unanalyzed at the edges. In addition, `kernel` argument of `convolution2D` is a matrix and it should not necessarily have squared dimensions. So, if the user specifies a rectangular kernel, the function will use the neighborhood as the Figure 3 shows. 
-
-```{r, message=FALSE, fig.height=2, fig.width=5.7, fig.cap = "Figure 3: Neighborhood kernel application for different kernel dimensions. Black dot indicates the position of the pixel over the filter will be applied. Arrows indicates the direction of filter application", results='hide', fig.pos="h", echo=FALSE}
-par(mar = rep(0, 4), mfrow = c(1, 3), xaxs = "i", yaxs = "i")
-
-plotKernels <- function(dim1 = 3, dim2 = 3, showArrows = FALSE){
-  
-  xlim <- c(-0.15, 1.1)
-  ylim <- c(-0.01, 1.3)
-
-  plot(1, 1, pch = NA, axes = FALSE, xlim = xlim, ylim = ylim, xlab = NA, ylab = NA)
-  polygon(x = c(0, 1, 1, 0), y = c(0, 0, 1, 1))
-  
-  delay1 <- ifelse(dim1 %% 2 != 0, 0, 1/(2*dim1))
-  delay2 <- ifelse(dim2 %% 2 != 0, 0, 1/(2*dim2))
-  
-  mtext(text = paste0(dim1, "x", dim2, " kernel"), side = 3, line = -2)
-  
-  for(i in seq(dim1 - 1)){
-    lines(c(0, 1), 1 - rep(i/dim1, 2))
-  }
-  
-  for(i in seq(dim2 - 1)){
-    lines(rep(i/dim2, 2), c(0, 1))
-  }
-  
-  # abline(h = seq(0, 1, length.out = dim1 + 1))
-  # abline(v = seq(0, 1, length.out = dim2 + 1))
-  
-  if(isTRUE(showArrows)){
-    arrows(x0 = -0.05, y0 = 1.05, x1 = -0.05, y1 = 0.8, length = 0.1)
-    arrows(x0 = -0.05, y0 = 1.05, x1 = 0.25, y1 = 1.05, length = 0.1)
-  }
-  
-  points(0.5 - delay2, 0.5 + delay1, pch = 16)
-}
-
-# 3x3 kernel
-plotKernels(3, 3, showArrows = TRUE)
-
-# 3x4 kernel
-plotKernels(3, 4)
-
-# 4x5 kernel
-plotKernels(4, 5)
-```
+In the field of image processing, one of the tools most commonly used are the **convolutions**, which consist of operations between two arrays: The array of image data (as a big matrix) and kernels (as small matrices) which weighs each pixel values by the values of its corresponding neighborhood. Different kernels produce different effects, for instance: blur, shifted images (right, left, up or down), sharpening, etc. The users must be cautious with the size of the kernel because the larger the radius, the more pixels remain unanalyzed at the edges.

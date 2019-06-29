@@ -69,8 +69,7 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
 
 // ENGINE 2: Convolution with quantiles
 // [[Rcpp::export]]
-NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs,
-                      int naVal){
+NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs, int naVal){
 
   // Get dimension of input matrix
   int nrows = data.nrow();
@@ -125,7 +124,7 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs,
         // Convert probs to an index
         int validPositions = (miniMatrixSize - naCounter);
 
-        int index = (int)round(std::floor((validPositions)*probs));
+        int index = (int)round(std::floor(validPositions*probs));
 
         double tempValue = miniMatrix[index];
         if(validPositions % 2 == 0){
@@ -183,7 +182,7 @@ NumericMatrix engine3(NumericMatrix data, int radius){
 
 // ENGINE 4: Quantile filter
 // [[Rcpp::export]]
-NumericMatrix engine4(NumericMatrix data, int radius, int probs, int naVal){
+NumericMatrix engine4(NumericMatrix data, int radius, double probs, int naVal){
   int nrows = data.nrow();
   int ncols = data.ncol();
 
@@ -224,7 +223,7 @@ NumericMatrix engine4(NumericMatrix data, int radius, int probs, int naVal){
         // Convert probs to an index
         int validPositions = (miniMatrixSize - naCounter);
 
-        int index = (int)round(std::floor((validPositions)*probs));
+        int index = (int)round(std::floor(validPositions*probs));
 
         double tempValue = miniMatrix[index];
         if(validPositions % 2 == 0){
@@ -238,6 +237,7 @@ NumericMatrix engine4(NumericMatrix data, int radius, int probs, int naVal){
   }
 
   return emptyData;
+  // return miniMatrix;
 }
 
 // ENGINE 5: Contextual Median Filter
@@ -500,7 +500,7 @@ NumericMatrix engine5(NumericMatrix data, double probs, int I_radius, int O_radi
             // Convert probs to an index
             int validPositions = (I_minimatrixSize - I_naCounter);
 
-            int index = (int)round(std::floor((validPositions)*probs));
+            int index = (int)round(std::floor(validPositions*probs));
 
             double tempValue = I_miniMatrix[index];
             if(validPositions % 2 == 0){
