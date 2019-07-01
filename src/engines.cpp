@@ -30,7 +30,8 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
   double knlColHalfDouble = std::floor(knlcols/2);
   int knlColHalf = (int)round(knlColHalfDouble);
 
-  int threshold = knlrows*knlcols;
+  // int threshold = knlrows*knlcols;
+  int threshold = 1;
 
   // Define output matrix, same dims of input
   NumericMatrix emptyData(nrows, ncols);

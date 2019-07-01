@@ -43,7 +43,8 @@ the kernel-weighted sum.
 \details{
 Convolution is a  mathematical operation which allows the multiplication of two arrays
 of numbers, in order to produce an array of numbers of the same dimensionality.
-Functions use C++ algorithms. More details are shown in the vignette.
+Valid results (showed in output) will be only those with non-NA values, so NA holes on
+a matrix will expand in the order of the kernel size.
 }
 \examples{
 # Generate example matrix
