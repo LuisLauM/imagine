@@ -6,7 +6,7 @@
 #' @details This package uses C++ algorithms called 'engines'. More details are shown in the vignette.
 #' @aliases imagine-package imagine
 #' @docType package
-#' @keywords image-matrix, image-filter
+#' @concept image-matrix, image-filter
 NULL
 
 #' @title Make convolution calculations from numeric matrix
@@ -219,21 +219,16 @@ medianFilter <- function(X, radius, times = 1, na = NA){
 #' Performs Contextual Median Filter
 #'
 #' @param X A \code{numeric matrix} object used for apply filters.
-#' @param inner_radius Size of the Inner squared kernel to apply median. Check Details.
-#' @param outer_radius Size of the Outer squared kernel to apply median. Check Details.
-#' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
 #' @param na \code{NA} as default. But, if specified, it must be an integer value higher
 #' than the maximum of \code{X}.
 #'
-#' @description This function performs a generalization of the Contextual Median Filter
-#' propose by Belkin & O'Reilly (2009). The default parameters reproduce the algorithm
-#' of the paper, but the function allows certain customization (see Details).
+#' @description This function performs the Contextual Median Filter proposed by Belkin &
+#' O'Reilly (2009), based on the pseudo-code written on the paper.
 #'
 #' @details
-#' The users can change some arguments like the big and small window matrices (3x3 and
-#' 5x5, respectively in the original paper) as well as the quantile to search (median
-#' as default, i.e. \code{probs = 0.5}) and the number of applications (\code{times = 1}).
+#' The users can change the number of recursive applications by using \code{times} argument
+#' (\code{times = 1} as default).
 #'
 #' @references Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
 #' detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
@@ -255,12 +250,12 @@ medianFilter <- function(X, radius, times = 1, na = NA){
 #'
 #' # Plot results
 #' image(myOutput, zlim = c(0, 100))
-contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, times = 1,
-                         na = NA){
+contextualMF <- function(X, times = 1, na = NA){
 
   # Check and validation of arguments
-  checkedArgs <- list(X = X, inner_radius = inner_radius, outer_radius = outer_radius,
-                      probs = probs, times = times, na = na)
+  # checkedArgs <- list(X = X, inner_radius = inner_radius, outer_radius = outer_radius,
+  #                     probs = probs, times = times, na = na)
+  checkedArgs <- list(X = X, times = times, na = na)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
 
   # Apply filters
@@ -269,9 +264,10 @@ contextualMF <- function(X, inner_radius = 3, outer_radius = 5, probs = 0.5, tim
     gc(reset = TRUE)
 
     # Apply filter
-    output <- with(checkedArgs,
-                   engine5(data = output, I_radius = inner_radius, O_radius = outer_radius,
-                           probs = probs, naVal = naVal))
+    # output <- with(checkedArgs,
+    #                engine5(data = output, I_radius = inner_radius, O_radius = outer_radius,
+    #                        probs = probs, naVal = naVal))
+    output <- with(checkedArgs, engine5(data = output, naVal = naVal))
 
     if(i < checkedArgs$times){
       # Replace NA

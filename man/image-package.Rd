@@ -15,5 +15,4 @@ This package uses C++ algorithms called 'engines'. More details are shown in the
 \author{
 Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
 }
-\keyword{image-filter}
-\keyword{image-matrix,}
+\concept{image-matrix, image-filter}

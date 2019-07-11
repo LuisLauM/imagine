@@ -208,9 +208,9 @@ checkArgs_quantileFilter <- function(allArgs){
 
 checkArgs_contextualMF <- function(allArgs){
   X <- allArgs$X
-  inner_radius <- allArgs$inner_radius
-  outer_radius <- allArgs$outer_radius
-  probs <- allArgs$probs
+  # inner_radius <- allArgs$inner_radius
+  # outer_radius <- allArgs$outer_radius
+  # probs <- allArgs$probs
   times <- allArgs$times
   na <- allArgs$na
 
@@ -218,29 +218,29 @@ checkArgs_contextualMF <- function(allArgs){
     stop("'X' must be a numeric matrix.")
   }
 
-  if(length(inner_radius) != 1 || !is.numeric(inner_radius) ||
-     length(outer_radius) != 1 || !is.numeric(outer_radius)){
-    stop("'outer_radius' and 'inner_radius' must be numeric vectors of length 1.")
-  }
-
-  if(inner_radius > nrow(X) || inner_radius > ncol(X) ||
-     outer_radius > nrow(X) || outer_radius > ncol(X)){
-    stop("'outer_radius' and 'inner_radius' must be less than the dimensions (number of row and columns) of 'X'.")
-  }
-
-  if(inner_radius >= outer_radius){
-    stop("'outer_radius' must be greater than 'inner_radius'.")
-  }
-
-  if(!isTRUE(all.equal(inner_radius, as.integer(inner_radius))) || !isTRUE(all.equal(outer_radius, as.integer(outer_radius)))){
-    warning("'inner_radius' and 'outer_radius' must be integer numbers. They will be coerced as integers.")
-    inner_radius <- as.integer(inner_radius)
-    outer_radius <- as.integer(outer_radius)
-  }
-
-  if(!is.numeric(probs) || length(probs) != 1 || probs < 0 || probs > 1){
-    stop("'probs' must be a numeric vector with values between 0 and 1 with length = 1.")
-  }
+  # if(length(inner_radius) != 1 || !is.numeric(inner_radius) ||
+  #    length(outer_radius) != 1 || !is.numeric(outer_radius)){
+  #   stop("'outer_radius' and 'inner_radius' must be numeric vectors of length 1.")
+  # }
+  #
+  # if(inner_radius > nrow(X) || inner_radius > ncol(X) ||
+  #    outer_radius > nrow(X) || outer_radius > ncol(X)){
+  #   stop("'outer_radius' and 'inner_radius' must be less than the dimensions (number of row and columns) of 'X'.")
+  # }
+  #
+  # if(inner_radius >= outer_radius){
+  #   stop("'outer_radius' must be greater than 'inner_radius'.")
+  # }
+  #
+  # if(!isTRUE(all.equal(inner_radius, as.integer(inner_radius))) || !isTRUE(all.equal(outer_radius, as.integer(outer_radius)))){
+  #   warning("'inner_radius' and 'outer_radius' must be integer numbers. They will be coerced as integers.")
+  #   inner_radius <- as.integer(inner_radius)
+  #   outer_radius <- as.integer(outer_radius)
+  # }
+  #
+  # if(!is.numeric(probs) || length(probs) != 1 || probs < 0 || probs > 1){
+  #   stop("'probs' must be a numeric vector with values between 0 and 1 with length = 1.")
+  # }
 
   if(length(times) != 1 || !is.numeric(times)){
     stop("'time' must be a numeric vector with length 1.")

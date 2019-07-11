@@ -4,17 +4,10 @@
 \alias{contextualMF}
 \title{Performs Contextual Median Filter}
 \usage{
-contextualMF(X, inner_radius = 3, outer_radius = 5, probs = 0.5,
-  times = 1, na = NA)
+contextualMF(X, times = 1, na = NA)
 }
 \arguments{
 \item{X}{A \code{numeric matrix} object used for apply filters.}
-
-\item{inner_radius}{Size of the Inner squared kernel to apply median. Check Details.}
-
-\item{outer_radius}{Size of the Outer squared kernel to apply median. Check Details.}
-
-\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 
 \item{times}{How many times do you want to apply the filter?}
 
@@ -26,14 +19,12 @@ than the maximum of \code{X}.}
 of \code{X}.
 }
 \description{
-This function performs a generalization of the Contextual Median Filter
-propose by Belkin & O'Reilly (2009). The default parameters reproduce the algorithm
-of the paper, but the function allows certain customization (see Details).
+This function performs the Contextual Median Filter proposed by Belkin &
+O'Reilly (2009), based on the pseudo-code written on the paper.
 }
 \details{
-The users can change some arguments like the big and small window matrices (3x3 and
-5x5, respectively in the original paper) as well as the quantile to search (median
-as default, i.e. \code{probs = 0.5}) and the number of applications (\code{times = 1}).
+The users can change the number of recursive applications by using \code{times} argument
+(\code{times = 1} as default).
 }
 \examples{
 # Generate example matrix
