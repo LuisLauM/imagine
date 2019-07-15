@@ -6,7 +6,8 @@
 #' @details This package uses C++ algorithms called 'engines'. More details are shown in the vignette.
 #' @aliases imagine-package imagine
 #' @docType package
-#' @concept image-matrix, image-filter
+#' @concept image-matrix
+#' @concept image-filter
 NULL
 
 #' @title Make convolution calculations from numeric matrix

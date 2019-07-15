@@ -270,6 +270,7 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
 
   // NS & WE inner matrix index
   IntegerVector index_inner = IntegerVector::create(1, 3, 4, 5, 7);
+  // IntegerVector index_inner = IntegerVector::create(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
   // Loop for the whole matrix
   for(int j = 2; j < (ncols - 2); j++){
@@ -380,7 +381,7 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
           }
 
           // Check if data(i, j) has been a max or min along 4 slices for outer kernel
-          if(outerTag == 4){
+          if(outerTag == 0){
             emptyData(i, j) = data(i, j);
           }else{
             /////////////////////// N-S slice //////////////////////
