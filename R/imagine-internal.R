@@ -79,28 +79,8 @@ checkArgs_convolutionQuantile <- function(allArgs){
     allArgs$times <- as.integer(allArgs$times)
   }
 
-  if(!is.na(na)){
-    if(sum(is.na(X)) > 0){
-      stop("If 'na' has been set as a value, 'X' must not contain any NA.")
-    }
-
-    if(length(na) != 1 || !is.numeric(na)){
-      stop("'na' must be set whether as NA or as a numeric value of length 1.")
-    }
-
-    if(max(X, na.rm = TRUE) >= as.integer(na)){
-      stop("'na' value must be an integer value higher than max(X).")
-    }
-
-    if(!isTRUE(all.equal(na, as.integer(na)))){
-      warning("'na' must be an integer number. It will be coerced as integer.")
-    }
-
-    allArgs$naVal <- as.integer(allArgs$na)
-  }else{
-    allArgs$naVal <- as.integer(ceiling(max(X, na.rm = TRUE)) + 1)
-    allArgs$X[is.na(allArgs$X)] <- allArgs$naVal
-  }
+  allArgs$naVal <- as.integer(ceiling(max(X, na.rm = TRUE)) + 1)
+  allArgs$X[is.na(allArgs$X)] <- allArgs$naVal
 
   return(allArgs)
 }

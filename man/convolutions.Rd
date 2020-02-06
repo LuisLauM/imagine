@@ -6,11 +6,11 @@
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
-convolution2D(X, kernel, times = 1)
+convolution2D(X, kernel, times = 1, normalize = FALSE)
 
-convolutionQuantile(X, kernel, probs, times = 1, na = NA)
+convolutionQuantile(X, kernel, probs, times = 1, normalize = FALSE)
 
-convolutionMedian(X, kernel, times = 1, na = NA)
+convolutionMedian(X, kernel, times = 1)
 }
 \arguments{
 \item{X}{A \code{numeric matrix} object used for apply filters.}
@@ -19,10 +19,10 @@ convolutionMedian(X, kernel, times = 1, na = NA)
 
 \item{times}{How many times do you want to apply the filter?}
 
-\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
+\item{normalize}{\code{logical} indicating if results will (or not) be normalized.
+See details.}
 
-\item{na}{\code{NA} as default. But, if specified, it must be an integer value higher
-than the maximum of \code{X}.}
+\item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
 \code{convolution2D} returns a \code{matrix} object with the same dimensions
@@ -45,6 +45,9 @@ Convolution is a  mathematical operation which allows the multiplication of two 
 of numbers, in order to produce an array of numbers of the same dimensionality.
 Valid results (showed in output) will be only those with non-NA values, so NA holes on
 a matrix will expand in the order of the kernel size.
+
+Normalization consists on divides the output by the \code{sum(abs(as.numeric(kernel)))}
+(disabled by default).
 }
 \examples{
 # Generate example matrix

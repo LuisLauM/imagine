@@ -18,8 +18,8 @@ NULL
 #' @param kernel A little matrix used as mask for each cell of \code{X}.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
-#' @param na \code{NA} as default. But, if specified, it must be an integer value higher
-#' than the maximum of \code{X}.
+#' @param normalize \code{logical} indicating if results will (or not) be normalized.
+#' See details.
 #'
 #' @description This function takes a \code{matrix} object, and for each cell multiplies
 #' its neighborhood by the \code{kernel}. Finally, it returns for each cell the mean of
@@ -33,6 +33,9 @@ NULL
 #' of numbers, in order to produce an array of numbers of the same dimensionality.
 #' Valid results (showed in output) will be only those with non-NA values, so NA holes on
 #' a matrix will expand in the order of the kernel size.
+#'
+#' Normalization consists on divides the output by the \code{sum(abs(as.numeric(kernel)))}
+#' (disabled by default).
 #'
 #' @export
 #'
@@ -53,7 +56,7 @@ NULL
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-convolution2D <- function(X, kernel, times = 1){
+convolution2D <- function(X, kernel, times = 1, normalize = FALSE){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X, kernel = kernel, times = times)
@@ -65,6 +68,10 @@ convolution2D <- function(X, kernel, times = 1){
     gc(reset = TRUE)
 
     output <- with(checkedArgs, engine1(data = output, kernel = kernel))
+
+    if(normalize){
+      output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
+    }
   }
 
   return(output)
@@ -75,10 +82,10 @@ convolution2D <- function(X, kernel, times = 1){
 #' the position
 #' of quantile 'probs' (value between 0 and 1).
 #' @export
-convolutionQuantile <- function(X, kernel, probs, times = 1, na = NA){
+convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
 
   # Check and validation of arguments
-  checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times, na = na)
+  checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "convolutionQuantile")
 
   # Apply filters
@@ -88,6 +95,10 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, na = NA){
 
     output <- with(checkedArgs,
                    engine2(data = output, kernel = kernel, probs = probs, naVal = naVal))
+
+    if(normalize){
+      output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
+    }
 
     if(i < checkedArgs$times){
       # Replace NA
@@ -107,10 +118,9 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, na = NA){
 #' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with
 #' probs = 0.5.
 #' @export
-convolutionMedian <- function(X, kernel, times = 1, na = NA){
+convolutionMedian <- function(X, kernel, times = 1){
 
-  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times,
-                                na = na)
+  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
 
   return(output)
 }
