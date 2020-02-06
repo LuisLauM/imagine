@@ -1,7 +1,9 @@
 imagine
 =======
 
-<!-- [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/imagine)](http://cran.r-project.org/package=imagine) [![](http://cranlogs.r-pkg.org/badges/imagine)](http://cran.rstudio.com/web/packages/imagine/index.html) -->
+[![packageversion](https://img.shields.io/badge/Package%20version-1.5.3-orange.svg?style=flat-square)](commits/master)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/imagine)](https://cran.r-project.org/package=imagine) [![CRAN_time_from_release](https://www.r-pkg.org/badges/ago/imagine)](https://cran.r-project.org/package=imagine) [![metacran downloads](https://cranlogs.r-pkg.org/badges/imagine)](https://cran.r-project.org/package=imagine) [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.1.0-6666ff.svg)](https://cran.r-project.org/)
+
 **[IMAG]ing eng[INE]s, Tools for Application of Image Filters to Data Matrices**
 
 Provides fast application of image filters to data matrices by using C++ algorithms called 'engines'. More details are shown in vignette.
