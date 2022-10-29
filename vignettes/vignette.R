@@ -1,10 +1,10 @@
-## ---- echo = FALSE, message = FALSE--------------------------------------
+## ---- echo = FALSE, message = FALSE-------------------------------------------
 library(imagine)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  install.packages("imagine")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # Build kernels
 #  # Kernel 1: For bottom edge recognition
 #  kernel1 <- matrix(c(-1, -2, -1,
@@ -59,7 +59,7 @@ mtext(text = "2D convolution", side = 1, line = -1.5, col = "white", font = 2, a
 image(convQuantileExample, col = cols, axes = FALSE)
 mtext(text = "2D quantile convolution", side = 1, line = -1.5, col = "black", font = 2, adj = 0.99)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # Add some noise (NA) to the image (matrix)
 #  set.seed(7)
 #  naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(myMatrix))), replace = FALSE)

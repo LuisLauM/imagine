@@ -13,7 +13,7 @@ quantileFilter(X, radius, probs, times = 1, na = NA)
 medianFilter(X, radius, times = 1, na = NA)
 }
 \arguments{
-\item{X}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A numeric \code{matrix} object used for apply filters.}
 
 \item{radius}{Size of squared kernel to apply median.}
 

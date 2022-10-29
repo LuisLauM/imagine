@@ -332,9 +332,10 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
           // Search for min & max
           double maxElement = max(tempVector);
           double minElement = min(tempVector);
+          double tempValDou = data(i, j);
 
           // If some min or max was found, increase the counter
-          if((data(i, j) == maxElement) | (data(i, j) == minElement)){
+          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
             outerTag++;
           }
 
@@ -343,12 +344,12 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
           tempVector = O_miniMatrix[we_outer];
           tempVector = tempVector[tempVector < naVal];
 
-          // Search for min & max
           maxElement = max(tempVector);
           minElement = min(tempVector);
+          tempValDou = data(i, j);
 
           // If some min or max was found, increase the counter
-          if((data(i, j) == maxElement) | (data(i, j) == minElement)){
+          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
             outerTag++;
           }
 
@@ -357,12 +358,12 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
           tempVector = O_miniMatrix[nwse_outer];
           tempVector = tempVector[tempVector < naVal];
 
-          // Search for min & max
           maxElement = max(tempVector);
           minElement = min(tempVector);
+          tempValDou = data(i, j);
 
           // If some min or max was found, increase the counter
-          if((data(i, j) == maxElement) | (data(i, j) == minElement)){
+          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
             outerTag++;
           }
 
@@ -371,12 +372,12 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
           tempVector = O_miniMatrix[nesw_outer];
           tempVector = tempVector[tempVector < naVal];
 
-          // Search for min & max
           maxElement = max(tempVector);
           minElement = min(tempVector);
+          tempValDou = data(i, j);
 
           // If some min or max was found, increase the counter
-          if((data(i, j) == maxElement) | (data(i, j) == minElement)){
+          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
             outerTag++;
           }
 
@@ -391,14 +392,13 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
             // Remove NA values
             tempVector = tempVector[tempVector < naVal];
 
-            // Search for min & max
-            double maxElement = max(tempVector);
-            double minElement = min(tempVector);
+            maxElement = max(tempVector);
+            minElement = min(tempVector);
+            tempValDou = data(i, j);
 
             // If some min or max was found, increase the counter
-
             // Check if data(i, j) has been a max or min along 4 slices for inner kernel
-            if((data(i, j) == maxElement) | (data(i, j) == minElement)){
+            if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
               // Sort values
               I_miniMatrix.sort();
 

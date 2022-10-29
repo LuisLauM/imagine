@@ -14,7 +14,7 @@ NULL
 #'
 #' @rdname convolutions
 #'
-#' @param X A \code{numeric matrix} object used for apply filters.
+#' @param X A numeric \code{matrix} object used for apply filters.
 #' @param kernel A little matrix used as mask for each cell of \code{X}.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
@@ -130,7 +130,7 @@ convolutionMedian <- function(X, kernel, times = 1){
 #'
 #' @rdname basic2DFilter
 #'
-#' @param X A \code{numeric matrix} object used for apply filters.
+#' @param X A numeric \code{matrix} object used for apply filters.
 #' @param radius Size of squared kernel to apply median.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
@@ -229,7 +229,7 @@ medianFilter <- function(X, radius, times = 1, na = NA){
 
 #' Performs Contextual Median Filter
 #'
-#' @param X A \code{numeric matrix} object used for apply filters.
+#' @param X A numeric \code{matrix} object used for apply filters.
 #' @param times How many times do you want to apply the filter?
 #' @param na \code{NA} as default. But, if specified, it must be an integer value higher
 #' than the maximum of \code{X}.
@@ -243,7 +243,7 @@ medianFilter <- function(X, radius, times = 1, na = NA){
 #'
 #' @references Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
 #' detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
-#' 319-326 (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+#' 319-326 (\doi{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
 #'
 #' @return \code{contextualMF} returns a \code{matrix} object with the same dimensions
 #' of \code{X}.

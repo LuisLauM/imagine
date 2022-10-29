@@ -7,7 +7,7 @@
 contextualMF(X, times = 1, na = NA)
 }
 \arguments{
-\item{X}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A numeric \code{matrix} object used for apply filters.}
 
 \item{times}{How many times do you want to apply the filter?}
 
@@ -42,5 +42,5 @@ image(myOutput, zlim = c(0, 100))
 \references{
 Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
 detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
-319-326 (\url{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+319-326 (\doi{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
 }

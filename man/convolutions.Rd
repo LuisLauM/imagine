@@ -13,7 +13,7 @@ convolutionQuantile(X, kernel, probs, times = 1, normalize = FALSE)
 convolutionMedian(X, kernel, times = 1)
 }
 \arguments{
-\item{X}{A \code{numeric matrix} object used for apply filters.}
+\item{X}{A numeric \code{matrix} object used for apply filters.}
 
 \item{kernel}{A little matrix used as mask for each cell of \code{X}.}
 

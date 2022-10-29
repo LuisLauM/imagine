@@ -4,7 +4,9 @@
 \name{wbImage}
 \alias{wbImage}
 \title{Data matrix to be used as example image.}
-\format{A \code{matrix} with dimnensions 1280x720.}
+\format{
+A \code{matrix} with dimnensions 1280x720.
+}
 \usage{
 wbImage
 }

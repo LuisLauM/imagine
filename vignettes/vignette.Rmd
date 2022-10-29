@@ -1,5 +1,5 @@
 ---
-title: "Vignette for imagine package"
+title: "imagine"
 author: "Wencheng Lau-Medrano"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
