@@ -252,16 +252,12 @@ medianFilter <- function(X, radius, times = 1){
 #' of \code{X}.
 contextualMF <- function(X){
 
-  X[is.na(X)] <- -9999
-
   # Check and validation of arguments
   checkedArgs <- list(X = X)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
 
   # Apply filters
   output <- with(checkedArgs, engine5(data = X))
-
-  X[x < -9998] <- NA
 
   return(output)
 }

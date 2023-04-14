@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <math.h>
 #include <RcppArmadillo.h>
+#include <fstream>
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
@@ -280,7 +281,6 @@ NumericMatrix engine5(NumericMatrix data){
   // NE-SW split outer matrix
   IntegerVector nesw_outer = IntegerVector::create(4, 8, 12, 16, 20);
 
-
   // INNER INDEX
   // |  1  2  3 |
   // |  4  5  6 |
@@ -292,180 +292,183 @@ NumericMatrix engine5(NumericMatrix data){
   // W-E split outer matrix
   IntegerVector we_inner = IntegerVector::create(4, 5, 6);
 
+  // Create outputs for Outer and Inner mini matrix
+  NumericVector O_miniMatrix(25);
+  NumericVector I_miniMatrix(9);
+
   // 1. Check for peaks and troughs within 1D 5-point slices through a sliding
   // 5×5 window. The window slides east–west (E–W), northsouth (N–S) across the
   // matrix:
 
   // Loop for the whole matrix
   for(int j = 2; j < (ncols - 2); j++){
+
     for(int i = 2; i < (nrows - 2); i++){
-      // If cell data(i, j) is missing, avoid it
-      if(!std::isnan(data(i, j))){
 
-        // Create outputs for Outer and Inner mini matrix
-        NumericVector O_miniMatrix(25);
-        NumericVector I_miniMatrix(9);
+      // Set I_miniMatrix values in zero
+      I_miniMatrix = I_miniMatrix * NA_REAL;
 
-        // Check NA on inner matrix
-        int naCounter = 0;
-        for(int n = 0; n < 3; n++){
-          for(int m = 0; m < 3; m++){
-            int index = m*3 + n;
-            int a = i + m - 1;
-            int b = j + n - 1;
+      // Check NA on inner matrix
+      int I_naCounter = 0;
+      for(int n = 0; n < 3; n++){
+        for(int m = 0; m < 3; m++){
+          int index = m*3 + n;
+          int a = i + m - 1;
+          int b = j + n - 1;
 
-            if(std::isnan(data(a, b))){
+          if(std::isnan(data(a, b))){
+            // If cell value is missing (NA), increase the counter
+            I_naCounter++;
+          }else{
+            // Otherwise, add to the miniMatrix
+            I_miniMatrix[index] = data(a, b);
+          }
+        }
+      }
+
+      if(I_naCounter < 8){
+
+        // Set O_miniMatrix values in zero
+        O_miniMatrix = O_miniMatrix * NA_REAL;
+
+        // Check NA on outer matrix
+        int O_naCounter = 0;
+        for(int q = 0; q < 5; q++){
+          for(int p = 0; p < 5; p++){
+            int index = p*5 + q;
+            int c = i + p - 1;
+            int d = j + q - 1;
+
+            if(std::isnan(data(c, d))){
               // If cell value is missing (NA), increase the counter
-              naCounter++;
+              O_naCounter++;
             }else{
               // Otherwise, add to the miniMatrix
-              I_miniMatrix[index] = data(a, b);
+              O_miniMatrix[index] = data(c, d);
             }
           }
         }
 
-        if(naCounter > 8){
-          continue;
-        }else{
-          // Check NA on outer matrix
-          for(int n = 0; n < 5; n++){
-            for(int m = 0; m < 5; m++){
-              int index = m*5 + n;
-              int a = i + m - 1;
-              int b = j + n - 1;
+        if((O_naCounter - I_naCounter) < 15){
 
-              if(std::isnan(data(a, b))){
-                // If cell value is missing (NA), increase the counter
-                naCounter++;
-              }else{
-                // Otherwise, add to the miniMatrix
-                O_miniMatrix[index] = data(a, b);
-              }
-            }
+          // Defining cell value
+          double cellValue = data(i, j);
+
+          // PEAK-5 SEARCH -----------------------------------------------------
+          // Set a counter for slices
+          int peak5 = 0;
+
+          ////////////////////// N-S slice //////////////////////
+          // Subset from outer mini matrix
+          NumericVector tempVector = O_miniMatrix[ns_outer];
+          tempVector = Rcpp::noNA(tempVector);
+
+          // Search for min & max
+          double maxElement = max(tempVector);
+          double minElement = min(tempVector);
+
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak5++;
           }
-        }
 
-        // Defining cell value
-        double cellValue = data(i, j);
+          ////////////////////// W-E slice //////////////////////
+          // Subset from outer mini matrix
+          tempVector = O_miniMatrix[we_outer];
+          tempVector = Rcpp::noNA(tempVector);
 
-        // PEAK-5 SEARCH -----------------------------------------------------
-        // Set a counter for slices
-        int peak5 = 0;
+          maxElement = max(tempVector);
+          minElement = min(tempVector);
 
-        ////////////////////// N-S slice //////////////////////
-        // Subset from outer mini matrix
-        NumericVector tempVector = O_miniMatrix[ns_outer];
-        tempVector = Rcpp::na_omit(tempVector);
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak5++;
+          }
 
-        // Search for min & max
-        double maxElement = max(tempVector);
-        double minElement = min(tempVector);
+          ////////////////////// NW-SE slice //////////////////////
+          // Subset from outer mini matrix
+          tempVector = O_miniMatrix[nwse_outer];
+          tempVector = Rcpp::noNA(tempVector);
 
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak5++;
-        }
+          maxElement = max(tempVector);
+          minElement = min(tempVector);
 
-        ////////////////////// W-E slice //////////////////////
-        // Subset from outer mini matrix
-        tempVector = O_miniMatrix[we_outer];
-        tempVector = Rcpp::na_omit(tempVector);
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak5++;
+          }
 
-        maxElement = max(tempVector);
-        minElement = min(tempVector);
+          ////////////////////// NE-SW slice //////////////////////
+          // Subset from outer mini matrix
+          tempVector = O_miniMatrix[nesw_outer];
+          tempVector = Rcpp::noNA(tempVector);
 
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak5++;
-        }
+          maxElement = max(tempVector);
+          minElement = min(tempVector);
 
-        ////////////////////// NW-SE slice //////////////////////
-        // Subset from outer mini matrix
-        tempVector = O_miniMatrix[nwse_outer];
-        tempVector = Rcpp::na_omit(tempVector);
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak5++;
+          }
 
-        maxElement = max(tempVector);
-        minElement = min(tempVector);
-
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak5++;
-        }
-
-        ////////////////////// NE-SW slice //////////////////////
-        // Subset from outer mini matrix
-        tempVector = O_miniMatrix[nesw_outer];
-        tempVector = Rcpp::na_omit(tempVector);
-
-        maxElement = max(tempVector);
-        minElement = min(tempVector);
-
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak5++;
-        }
-
-        // Defining tag of peak-5
-        bool peak5_tag = peak5 == 4;
+          // Defining tag of peak-5
+          bool peak5_tag = peak5 == 4;
 
 
-        // 2. Check for peaks and troughs within 1D 3-point slices through
-        // sliding 3×3 window. The window slides west–east, north–south across
-        // the matrix:
 
-        // PEAK-3 SEARCH -----------------------------------------------------
-        // Set a counter for slices
-        int peak3 = 0;
+          // 2. Check for peaks and troughs within 1D 3-point slices through
+          // sliding 3×3 window. The window slides west–east, north–south across
+          // the matrix:
 
-        ////////////////////// N-S slice //////////////////////
-        // Subset from outer mini matrix
-        tempVector = I_miniMatrix[ns_inner];
-        tempVector = Rcpp::na_omit(tempVector);
+          // PEAK-3 SEARCH -----------------------------------------------------
+          // Set a counter for slices
+          int peak3 = 0;
 
-        // Search for min & max
-        maxElement = max(tempVector);
-        minElement = min(tempVector);
+          ////////////////////// N-S slice //////////////////////
+          // Subset from outer mini matrix
+          tempVector = I_miniMatrix[ns_inner];
+          tempVector = Rcpp::noNA(tempVector);
 
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak3++;
-        }
+          // Search for min & max
+          maxElement = max(tempVector);
+          minElement = min(tempVector);
 
-        ////////////////////// W-E slice //////////////////////
-        // Subset from outer mini matrix
-        tempVector = I_miniMatrix[we_inner];
-        tempVector = Rcpp::na_omit(tempVector);
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak3++;
+          }
 
-        maxElement = max(tempVector);
-        minElement = min(tempVector);
+          ////////////////////// W-E slice //////////////////////
+          // Subset from outer mini matrix
+          tempVector = I_miniMatrix[we_inner];
+          tempVector = Rcpp::noNA(tempVector);
 
-        // If some min or max was found, increase the counter
-        if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
-          peak3++;
-        }
+          maxElement = max(tempVector);
+          minElement = min(tempVector);
 
-        // Defining tag of peak-3
-        bool peak3_tag = peak3 == 2;
+          // If some min or max was found, increase the counter
+          if((abs(cellValue - minElement) < 1e-6) || (abs(cellValue - maxElement) < 1e-6)){
+            peak3++;
+          }
 
-        // 3. Apply the selective 2D 3×3 median filter within sliding 3×3 window.
-        // If the window center is a significant 5-point extremum (Peak-5),
-        // leave it intact (do not blunt it with median filter), otherwise if
-        // the window center is a spike (Peak-3) use the 2D 3×3 median filter:
+          // Defining tag of peak-3
+          bool peak3_tag = peak3 == 2;
 
-        if(!peak5_tag && peak3_tag){
+          // 3. Apply the selective 2D 3×3 median filter within sliding 3×3 window.
+          // If the window center is a significant 5-point extremum (Peak-5),
+          // leave it intact (do not blunt it with median filter), otherwise if
+          // the window center is a spike (Peak-3) use the 2D 3×3 median filter:
 
-          I_miniMatrix = Rcpp::na_omit(I_miniMatrix);
+          if(!peak5_tag && peak3_tag){
 
-          arma::vec I_miniMatrix2 = as<arma::vec>(wrap(I_miniMatrix));
+            // Calculate median of inner matrix
+            NumericVector outVal = Rcpp::noNA(I_miniMatrix);
 
-          arma::mat I_miniMatrix3 = arma::reshape(I_miniMatrix2, I_miniMatrix2.n_elem, 1);
-
-          arma::mat quantVal = arma::median(I_miniMatrix3);
-
-          // Put the median value of the Inner miniMatrix
-          emptyData(i, j) = arma::conv_to < double >::from(quantVal);
-        }else{
-          emptyData(i, j) = cellValue;
+            // Replace the corresponding position in the output matrix
+            emptyData(i, j) = Rcpp::median(outVal);
+          }else{
+            emptyData(i, j) = cellValue;
+          }
         }
       }
     }
