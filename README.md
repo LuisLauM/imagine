@@ -63,6 +63,5 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 ### v. 2.0.0
 
--   Important corrections and changes in engines 2 and 4, so as in functions `convolutionQuantile`, `convolutionMedian` and `quantileFilter`.
+-   Important corrections and changes in engines 2, 4 and 5, so as in functions `convolutionQuantile`, `convolutionMedian`, `quantileFilter` and `contextualMF`.
 -   `na` argument is removed from previous functions: only `NA` is a `NA`.
--   Function `contextualMF` was deprecated in order to start a revision and deployment through [**grec**](https://cran.r-project.org/web/packages/grec/index.html) package.

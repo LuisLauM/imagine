@@ -256,7 +256,6 @@ NumericMatrix engine4(arma::mat data, NumericVector radius, arma::vec probs){
 // is_extreme function
 // Evaluate if the center of a defined matrix is a maximum/minimum in the whole
 // matrix
-// [[Rcpp::export]]
 int is_extreme(NumericMatrix in_mat, int direction){
 
   int side = in_mat.nrow();
@@ -321,6 +320,7 @@ NumericMatrix engine5(NumericMatrix data){
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
+
   // ---------------------------------------------------------------------------
   // 1. Check for peaks and troughs within 1D 5-point slices through a sliding
   // 5×5 window. The window slides east–west (E–W), northsouth (N–S) across the
@@ -383,12 +383,14 @@ NumericMatrix engine5(NumericMatrix data){
         // Defining tag of peak-5
         bool peak3_tag = (peak3 == 2);
 
-        // -----------------------------------------------------------------------
+
+        // ---------------------------------------------------------------------
         // 3. Apply the selective 2D 3×3 median filter within sliding 3×3 window.
         // If the window center is a significant 5-point extremum (Peak-5),
         // leave it intact (do not blunt it with median filter), otherwise if
         // the window center is a spike (Peak-3) use the 2D 3×3 median filter:
         if(!peak5_tag && peak3_tag){
+
           // Calculate median of inner matrix
           NumericVector outVal = na_omit(as<NumericVector>(I_miniMatrix));
 

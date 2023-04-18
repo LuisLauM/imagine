@@ -22,10 +22,6 @@ engine4 <- function(data, radius, probs) {
     .Call(`_imagine_engine4`, data, radius, probs)
 }
 
-is_extreme <- function(in_mat, direction) {
-    .Call(`_imagine_is_extreme`, in_mat, direction)
-}
-
 engine5 <- function(data) {
     .Call(`_imagine_engine5`, data)
 }
