@@ -24,8 +24,7 @@ argument will not be available anymore.
 
 \strong{imagine} offers the CMF algorithm but for the using to find out
 oceanographic fronts, it is recommended to see and use the functions of the
-\href{https://cran.r-project.org/web/packages/grec/index.html}{\strong{grec}}
-package.
+\href{https://CRAN.R-project.org/package=grec}{\strong{grec}} package.
 }
 \references{
 Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic

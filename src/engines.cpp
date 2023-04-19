@@ -325,8 +325,8 @@ NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
 
   // ---------------------------------------------------------------------------
   // 1. Check for peaks and troughs within 1D 5-point slices through a sliding
-  // 5×5 window. The window slides east–west (E–W), northsouth (N–S) across the
-  // matrix:
+  // 5 x 5 window. The window slides east-west (E-W), northsouth (N-S) across
+  // the matrix:
 
   // Loop for the whole matrix
   for(int j = o_halfsize; j < (ncols - o_halfsize); j++){
@@ -343,7 +343,7 @@ NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
                                         Range(j - i_halfsize, j + i_halfsize));
 
       // If some of the inner matrices are full of NA, pass to the next cell
-      if(all(is_na(O_miniMatrix)) | all(is_na(I_miniMatrix))) continue;
+      if((all(is_na(O_miniMatrix)) + all(is_na(I_miniMatrix))) > 0) continue;
 
       // If the cell value IS NOT A NA, evaluating if it is an extreme value for
       // a 3x3 and 5x5 matrix neightborhood
@@ -371,7 +371,7 @@ NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
 
         // ---------------------------------------------------------------------
         // 2. Check for peaks and troughs within 1D 3-point slices through
-        // sliding 3×3 window. The window slides west–east, north–south across
+        // sliding 3x3 window. The window slides west-east, north-south across
         // the matrix:
 
         // PEAK-3 SEARCH
@@ -389,10 +389,10 @@ NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
 
 
         // ---------------------------------------------------------------------
-        // 3. Apply the selective 2D 3×3 median filter within sliding 3×3 window.
+        // 3. Apply the selective 2D 3x3 median filter within sliding 3x3 window.
         // If the window center is a significant 5-point extremum (Peak-5),
         // leave it intact (do not blunt it with median filter), otherwise if
-        // the window center is a spike (Peak-3) use the 2D 3×3 median filter:
+        // the window center is a spike (Peak-3) use the 2D 3x3 median filter:
         if(!peak5_tag && peak3_tag){
 
           // Calculate median of inner matrix
