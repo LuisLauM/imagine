@@ -291,7 +291,7 @@ int is_extreme(NumericMatrix in_mat, int direction){
     }
     break;
   default:
-    cout << "\nInvalid value for 'direction'." << endl;
+    break;
   }
 
   // Remove NA of tempVector
@@ -310,7 +310,7 @@ int is_extreme(NumericMatrix in_mat, int direction){
 // ENGINE 5: Contextual Median Filter
 // Proposed by Belkin et al. (2009), doi:10.1016/j.jmarsys.2008.11.018
 // [[Rcpp::export]]
-NumericMatrix engine5(NumericMatrix data){
+NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
 
   // Get dimension of input matrix
   int nrows = data.nrow();
@@ -320,6 +320,8 @@ NumericMatrix engine5(NumericMatrix data){
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
+  int i_halfsize = floor(i_size/2);
+  int o_halfsize = floor(o_size/2);
 
   // ---------------------------------------------------------------------------
   // 1. Check for peaks and troughs within 1D 5-point slices through a sliding
@@ -327,16 +329,18 @@ NumericMatrix engine5(NumericMatrix data){
   // matrix:
 
   // Loop for the whole matrix
-  for(int j = 2; j < (ncols - 2); j++){
+  for(int j = o_halfsize; j < (ncols - o_halfsize); j++){
 
-    for(int i = 2; i < (nrows - 2); i++){
+    for(int i = o_halfsize; i < (nrows - o_halfsize); i++){
 
       // Defining cell value
       double cellValue = data(i, j);
 
       // Create outputs for Outer and Inner mini matrix
-      NumericMatrix O_miniMatrix = data(Range(i - 2, i + 2), Range(j - 2, j + 2));
-      NumericMatrix I_miniMatrix = data(Range(i - 1, i + 1), Range(j - 1, j + 1));
+      NumericMatrix O_miniMatrix = data(Range(i - o_halfsize, i + o_halfsize),
+                                        Range(j - o_halfsize, j + o_halfsize));
+      NumericMatrix I_miniMatrix = data(Range(i - i_halfsize, i + i_halfsize),
+                                        Range(j - i_halfsize, j + i_halfsize));
 
       // If some of the inner matrices are full of NA, pass to the next cell
       if(all(is_na(O_miniMatrix)) | all(is_na(I_miniMatrix))) continue;

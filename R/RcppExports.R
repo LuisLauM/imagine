@@ -22,7 +22,7 @@ engine4 <- function(data, radius, probs) {
     .Call(`_imagine_engine4`, data, radius, probs)
 }
 
-engine5 <- function(data) {
-    .Call(`_imagine_engine5`, data)
+engine5 <- function(data, i_size = 3L, o_size = 5L) {
+    .Call(`_imagine_engine5`, data, i_size, o_size)
 }
 

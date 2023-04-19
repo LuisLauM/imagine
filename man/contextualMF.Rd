@@ -10,19 +10,25 @@ contextualMF(X)
 \item{X}{A numeric \code{matrix} object used for apply filters.}
 }
 \value{
-\code{contextualMF} returns a \code{matrix} object with the same dimensions
-of \code{X}.
+\code{contextualMF} returns a \code{matrix} object with the same
+dimensions of \code{X}.
 }
 \description{
-This function performs the Contextual Median Filter proposed by
-Belkin & O'Reilly (2009), based on the pseudo-code written on the paper.
+This function performs the Contextual Median Filter (CMF)
+algorithm proposed by Belkin & O'Reilly (2009), based on the pseudo-code
+written on the paper.
 }
 \details{
-By definition, this function allows to be applied once, so since v.2.0.0,
-\code{times} argument is not available anymore.
+Following the definition of CMF, since \strong{imagine} v.2.0.0, \code{times}
+argument will not be available anymore.
+
+\strong{imagine} offers the CMF algorithm but for the using to find out
+oceanographic fronts, it is recommended to see and use the functions of the
+\href{https://cran.r-project.org/web/packages/grec/index.html}{\strong{grec}}
+package.
 }
 \references{
-Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front
-detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3),
-319-326 (\doi{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
+Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic
+front detection in chlorophyll and SST satellite imagery. Journal of Marine
+Systems, 78(3), 319-326 (\doi{http://dx.doi.org/10.1016/j.jmarsys.2008.11.018}).
 }

@@ -63,5 +63,6 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 ### v. 2.0.0
 
--   Important corrections and changes in engines 2, 4 and 5, so as in functions `convolutionQuantile`, `convolutionMedian`, `quantileFilter` and `contextualMF`.
--   `na` argument is removed from previous functions: only `NA` is a `NA`.
+-   Important corrections, improvements and changes in engines 2, 4 and 5, so as in functions `convolutionQuantile`, `convolutionMedian`, `quantileFilter` and `contextualMF`.
+-   `times` argument in `contextualMF` is not longer available.
+-   `na` argument is removed from previous functions: only `NA` will be considered as a `NA`.
