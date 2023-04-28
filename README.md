@@ -1,15 +1,12 @@
-imagine
-=======
+# imagine
 
-[![packageversion](https://img.shields.io/badge/Package%20version-1.5.3-orange.svg?style=flat-square)](commits/master)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/imagine)](https://cran.r-project.org/package=imagine) [![CRAN_time_from_release](https://www.r-pkg.org/badges/ago/imagine)](https://cran.r-project.org/package=imagine) [![metacran downloads](https://cranlogs.r-pkg.org/badges/imagine)](https://cran.r-project.org/package=imagine) [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.1.0-6666ff.svg)](https://cran.r-project.org/)
+[![packageversion](https://img.shields.io/badge/Package%20version-1.5.3-orange.svg?style=flat-square)](commits/master) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/imagine)](https://cran.r-project.org/package=imagine) [![CRAN_time_from_release](https://www.r-pkg.org/badges/ago/imagine)](https://cran.r-project.org/package=imagine) [![metacran downloads](https://cranlogs.r-pkg.org/badges/imagine)](https://cran.r-project.org/package=imagine) [![minimal R version](https://img.shields.io/badge/R%3E%253D-3.1.0-6666ff.svg)](https://cran.r-project.org/)
 
 **[IMAG]ing eng[INE]s, Tools for Application of Image Filters to Data Matrices**
 
 Provides fast application of image filters to data matrices by using C++ algorithms called 'engines'. More details are shown in vignette.
 
-Installation
-------------
+## Installation
 
 Get the development version from github:
 
@@ -24,13 +21,11 @@ Or install the CRAN version
 install.packages("imagine")
 ```
 
-Input data
-----------
+## Input data
 
 For all functions, the main input data must be a `numeric matrix` object. Depending on each funtion, user must indicate some extra arguments for the filter.
 
-Examples
---------
+## Examples
 
 Next, we show the utility of `quantileFilter`, one of the six functions that `imagine` performs.
 
@@ -63,3 +58,11 @@ mtext(text = "Original with NAs", side = 2, line = 0.5, font = 2)
 image(newMatrix, col = cols, axes = FALSE)
 mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 ```
+
+## Versions
+
+### v. 2.0.0
+
+-   Important corrections, improvements and changes in engines 2, 4 and 5, so as in functions `convolutionQuantile`, `convolutionMedian`, `quantileFilter` and `contextualMF`.
+-   `times` argument in `contextualMF` is not longer available.
+-   `na` argument is removed from previous functions: only `NA` will be considered as a `NA`.

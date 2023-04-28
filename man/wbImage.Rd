@@ -11,6 +11,6 @@ A \code{matrix} with dimnensions 1280x720.
 wbImage
 }
 \description{
-\code{matrix} object containig numeric data to plot a image. The photo
-was taken by the author at 2016.
+\code{matrix} object containig numeric data to plot a image. The
+photo was taken by the author on 2016.
 }

@@ -1,11 +1,18 @@
-#include <Rcpp.h>
+
 #include <algorithm>
 #include <math.h>
+#include <RcppArmadillo.h>
+#include <fstream>
 
+// [[Rcpp::depends(RcppArmadillo)]]
+
+using namespace arma;
 using namespace Rcpp;
 
 //' @importFrom Rcpp evalCpp
+//' @importFrom RcppArmadillo armadillo_version
 //' @useDynLib imagine, .registration = TRUE
+
 
 // ENGINE 1: 2D convolution
 // [[Rcpp::export]]
@@ -38,7 +45,7 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
     for(int i = knlRowHalf; i < (nrows - knlRowHalf); i++){
 
       double cumSum = 0;
-      int naSum = 0;
+      int naCounter = 0;
 
       // Multiply the value of each cell by the corresponding value of the kernel.
       for(int n = 0; n < knlcols; n++){
@@ -46,17 +53,18 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
           int a = i + m - knlRowHalf;
           int b = j + n - knlColHalf;
 
-          // If the value is a NA do not consider for sum and increase the naSum counter
+          // If the value is a NA do not consider for sum and increase the naCounter
           if(std::isnan(data(a, b))){
-            naSum++;
+            naCounter++;
           }else{
             cumSum += data(a, b)*kernel(m, n);
           }
         }
       }
 
-      // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
-      if(naSum < threshold){
+      // Assign sum of values to corresponding cell, if all the values were NA,
+      // result will be NA
+      if(naCounter < threshold){
         emptyData(i, j) = cumSum;
       }
     }
@@ -67,15 +75,15 @@ NumericMatrix engine1(NumericMatrix data, NumericMatrix kernel){
 
 // ENGINE 2: Convolution with quantiles
 // [[Rcpp::export]]
-NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs, int naVal){
+NumericMatrix engine2(arma::mat data, arma::mat kernel, arma::vec probs){
 
   // Get dimension of input matrix
-  int nrows = data.nrow();
-  int ncols = data.ncol();
+  int nrows = data.n_rows;
+  int ncols = data.n_cols;
 
   // Get dimension of input kernel
-  int knlrows = kernel.nrow();
-  int knlcols = kernel.ncol();
+  int knlrows = kernel.n_rows;
+  int knlcols = kernel.n_cols;
 
   // Get half row size for kernel
   double knlRowHalfDouble = std::floor(knlrows/2);
@@ -85,52 +93,50 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs, in
   double knlColHalfDouble = std::floor(knlcols/2);
   int knlColHalf = (int)round(knlColHalfDouble);
 
-  int miniMatrixSize = knlrows*knlcols;
-  NumericVector miniMatrix(miniMatrixSize);
-
-  // Define output matrix, same dims of input
+  // Define an empty matrix as large as the original where the output values
+  // will be storaged
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
-  for(int j = knlColHalf; j < (ncols - knlColHalf); j++){
-    for(int i = knlRowHalf; i < (nrows - knlRowHalf); i++){
+  // Define a matrix as large as the kernel where the temporal convolution
+  // output values will be storaged
+  arma::mat miniMatrix(knlrows, knlcols);
 
+  // Loop along every cell of original matrix
+  for(int j = knlColHalf; j < (ncols - knlcols); j++){
+    for(int i = knlRowHalf; i < (nrows - knlrows); i++){
+
+      // Initialize NA counter
       int naCounter = 0;
 
-      // Multiply the value of each cell by the corresponding value of the kernel.
+      // Loop along each window (kernel-sized) around each cell
       for(int n = 0; n < knlcols; n++){
         for(int m = 0; m < knlrows; m++){
-          int index = m*knlcols + n;
+
+          // Define relative indexes for the current window
           int a = i + m - knlRowHalf;
           int b = j + n - knlColHalf;
 
-          // If the value is a NA do not consider for sum and increase the naSum counter
-          if(abs(data(a, b) - naVal) > 0){
-            miniMatrix[index] = data(a, b)*kernel(m, n);
-          }else{
-            miniMatrix[index] = naVal;
+          // Calculate the product of original-matrix and kernel values
+          miniMatrix(m, n) = data(a, b)*kernel(m, n);
+
+          // If cell value is a NA, increasing the counter
+          if(std::isnan(data(a, b))){
             naCounter++;
           }
         }
       }
 
-      // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
-      if(naCounter < miniMatrixSize){
-        // Sort values
-        miniMatrix.sort();
+      // Only if the ammount of NAs is lower than the # of elements of miniMatrix
+      if(naCounter < (knlrows*knlcols)){
+        // Reshape miniMatrix as an Armadillo matrix of 1 column
+        arma::mat miniMatrix2 = arma::reshape(miniMatrix, miniMatrix.n_elem, 1);
 
-        // Convert probs to an index
-        int validPositions = (miniMatrixSize - naCounter);
+        // Calculate the quantile
+        arma::mat quantVal = arma::quantile(miniMatrix2.elem(arma::find_finite(miniMatrix2)), probs);
 
-        int index = (int)round(std::floor(validPositions*probs));
-
-        double tempValue = miniMatrix[index];
-        if(validPositions % 2 == 0){
-          tempValue = (tempValue + miniMatrix[index - 1])/2;
-        }
-
-        // Put the median value of the Inner miniMatrix
-        emptyData(i, j) = tempValue;
+        // Replace the quantile value in the corresponding cell of the output matrix
+        emptyData(i, j) = arma::conv_to < double >::from(quantVal);
       }
     }
   }
@@ -140,27 +146,42 @@ NumericMatrix engine2(NumericMatrix data, NumericMatrix kernel, double probs, in
 
 // ENGINE 3: Mean filter
 // [[Rcpp::export]]
-NumericMatrix engine3(NumericMatrix data, int radius){
+NumericMatrix engine3(NumericMatrix data, NumericVector radius){
+
+  // Get dimension of input matrix
   int nrows = data.nrow();
   int ncols = data.ncol();
 
+  // Get dimension of input kernel
+  int radius_row = radius[0];
+  int radius_col = radius[1];
+
+  // Get half row size for kernel
+  double halfRadiusDouble = std::floor(radius_row/2);
+  int halfRadius_row = (int)round(halfRadiusDouble);
+
+  // Get half column size for kernel
+  halfRadiusDouble = std::floor(radius_col/2);
+  int halfRadius_col = (int)round(halfRadiusDouble);
+
+  // Define an empty matrix as large as the original where the output values
+  // will be storaged
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
-  double halfRadiusDouble = std::floor(radius/2);
-  int halfRadius = (int)round(halfRadiusDouble);
+  // Loop along every cell of original matrix
+  for(int j = halfRadius_col; j < (ncols - halfRadius_col); j++){
+    for(int i = halfRadius_row; i < (nrows - halfRadius_row); i++){
 
-  for(int j = halfRadius; j < (ncols - halfRadius); j++){
-    for(int i = halfRadius; i < (nrows - halfRadius); i++){
-
+      // Initialize cumsum of window values (cumSum) and no-NA values (k)
       double cumSum = 0;
       int k = 0;
 
-      for(int n = 0; n < radius; n++){
-        for(int m = 0; m < radius; m++){
+      for(int n = 0; n < radius_col; n++){
+        for(int m = 0; m < radius_row; m++){
 
-          int a = i + m - halfRadius;
-          int b = j + n - halfRadius;
+          int a = i + m - halfRadius_row;
+          int b = j + n - halfRadius_col;
 
           if(!std::isnan(data(a, b))){
             cumSum += data(a, b);
@@ -169,6 +190,7 @@ NumericMatrix engine3(NumericMatrix data, int radius){
         }
       }
 
+      // Only if there is one or more of no-NA values
       if(k > 0){
         emptyData(i, j) = cumSum/k;
       }
@@ -180,68 +202,117 @@ NumericMatrix engine3(NumericMatrix data, int radius){
 
 // ENGINE 4: Quantile filter
 // [[Rcpp::export]]
-NumericMatrix engine4(NumericMatrix data, int radius, double probs, int naVal){
-  int nrows = data.nrow();
-  int ncols = data.ncol();
+NumericMatrix engine4(arma::mat data, NumericVector radius, arma::vec probs){
+
+  // Get dimension of input matrix
+  int nrows = data.n_rows;
+  int ncols = data.n_cols;
+
+  int radius_row = radius[0];
+  int radius_col = radius[1];
 
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
-  int miniMatrixSize = radius*radius;
-  NumericVector miniMatrix(miniMatrixSize);
+  arma::mat miniMatrix(radius_row, radius_col);
 
-  double halfRadiusDouble = std::floor(radius/2);
-  int halfRadius = (int)round(halfRadiusDouble);
+  double halfRadiusDouble = std::floor(radius_row/2);
+  int halfRadius_row = (int)round(halfRadiusDouble);
 
-  for(int j = halfRadius; j < (ncols - halfRadius); j++){
-    for(int i = halfRadius; i < (nrows - halfRadius); i++){
+  halfRadiusDouble = std::floor(radius_col/2);
+  int halfRadius_col = (int)round(halfRadiusDouble);
+
+  for(int j = halfRadius_col; j < (ncols - halfRadius_col); j++){
+    for(int i = halfRadius_row; i < (nrows - halfRadius_row); i++){
 
       int naCounter = 0;
+      for(int n = 0; n < radius_col; n++){
+        for(int m = 0; m < radius_row; m++){
 
-      for(int n = 0; n < radius; n++){
-        for(int m = 0; m < radius; m++){
-          int index = m*radius + n;
-          int a = i + m - halfRadius;
-          int b = j + n - halfRadius;
+          int a = i + m - halfRadius_row;
+          int b = j + n - halfRadius_col;
 
-          if(abs(data(a, b) - naVal) > 0){
-            miniMatrix[index] = data(a, b);
-          }else{
-            miniMatrix[index] = naVal;
+          miniMatrix(m, n) = data(a, b);
+
+          if(std::isnan(data(a, b))){
             naCounter++;
           }
         }
       }
 
-      // Assign sum of values to corresponding cell, if all the values were NA, result will be NA
-      if(naCounter < miniMatrixSize){
-        // Sort values
-        miniMatrix.sort();
+      if(naCounter < (radius_row*radius_col)){
+        arma::mat miniMatrix2 = arma::reshape(miniMatrix, miniMatrix.n_elem, 1);
 
-        // Convert probs to an index
-        int validPositions = (miniMatrixSize - naCounter);
+        arma::mat quantVal = arma::quantile(miniMatrix2.elem(arma::find_finite(miniMatrix2)), probs);
 
-        int index = (int)round(std::floor(validPositions*probs));
-
-        double tempValue = miniMatrix[index];
-        if(validPositions % 2 == 0){
-          tempValue = (tempValue + miniMatrix[index - 1])/2;
-        }
-
-        // Put the median value of the Inner miniMatrix
-        emptyData(i, j) = tempValue;
+        emptyData(i, j) = arma::conv_to < double >::from(quantVal);
       }
     }
   }
 
   return emptyData;
-  // return miniMatrix;
+}
+
+// is_extreme function
+// Evaluate if the center of a defined matrix is a maximum/minimum in the whole
+// matrix
+int is_extreme(NumericMatrix in_mat, int direction){
+
+  int side = in_mat.nrow();
+
+  NumericVector tempVector(side ^ 2);
+  tempVector = tempVector * NA_REAL;
+  int midPos = std::floor(side/2);
+
+  double cellVal = in_mat(midPos, midPos);
+
+  switch(direction){
+  // WE slice
+  case 1:
+    tempVector = in_mat(midPos, _);
+    break;
+
+    // NS slice
+  case 2:
+    tempVector = in_mat(_, midPos);
+    break;
+
+    // NW-SE slice
+  case 3:
+    for(int i = 0; i < side; i++){
+      tempVector[i] = in_mat(i, i);
+    }
+    break;
+
+    // NE-SW slice
+  case 4:
+    for(int i = 0; i < side; i++){
+      tempVector[i] = in_mat(i, side - i);
+    }
+    break;
+  default:
+    break;
+  }
+
+  // Remove NA of tempVector
+  tempVector = na_omit(tempVector);
+
+  // Search for min & max
+  double maxElement = max(tempVector);
+  double minElement = min(tempVector);
+
+  // If some min or max was found, increase the counter
+  int out = (cellVal <= minElement) || (cellVal >= maxElement);
+
+  return out;
 }
 
 // ENGINE 5: Contextual Median Filter
 // Proposed by Belkin et al. (2009), doi:10.1016/j.jmarsys.2008.11.018
 // [[Rcpp::export]]
-NumericMatrix engine5(NumericMatrix data, int naVal){
+NumericMatrix engine5(NumericMatrix data, int i_size = 3, int o_size = 5){
+
+  // Get dimension of input matrix
   int nrows = data.nrow();
   int ncols = data.ncol();
 
@@ -249,178 +320,88 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
   NumericMatrix emptyData(nrows, ncols);
   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
 
-  // OUTER INDEX
-  // |  0  1  2  3  4 |
-  // |  5  6  7  8  9 |
-  // | 10 11 12 13 14 |
-  // | 15 16 17 18 19 |
-  // | 20 21 22 23 24 |
+  int i_halfsize = floor(i_size/2);
+  int o_halfsize = floor(o_size/2);
 
-  // N-S split outer matrix
-  IntegerVector ns_outer = IntegerVector::create(2, 7, 12, 17, 22);
-
-  // W-E split outer matrix
-  IntegerVector we_outer = IntegerVector::create(10, 11, 12, 13, 14);
-
-  // NW-SE split outer matrix
-  IntegerVector nwse_outer = IntegerVector::create(0, 6, 12, 18, 24);
-
-  // NE-SW split outer matrix
-  IntegerVector nesw_outer = IntegerVector::create(4, 8, 12, 16, 20);
-
-  // NS & WE inner matrix index
-  IntegerVector index_inner = IntegerVector::create(1, 3, 4, 5, 7);
-  // IntegerVector index_inner = IntegerVector::create(0, 1, 2, 3, 4, 5, 6, 7, 8);
+  // ---------------------------------------------------------------------------
+  // 1. Check for peaks and troughs within 1D 5-point slices through a sliding
+  // 5 x 5 window. The window slides east-west (E-W), northsouth (N-S) across
+  // the matrix:
 
   // Loop for the whole matrix
-  for(int j = 2; j < (ncols - 2); j++){
-    for(int i = 2; i < (nrows - 2); i++){
-      // If cell data(i, j) is missing, avoid it
-      if(abs(data(i, j) - naVal) > 0){
-        // Create outputs for Outer and Inner mini matrix
-        NumericVector O_miniMatrix(25);
-        NumericVector I_miniMatrix(9);
+  for(int j = o_halfsize; j < (ncols - o_halfsize); j++){
 
-        // Build outer minimatrix (checking NA)
-        int O_naCounter = 0;
-        for(int n = 0; n < 5; n++){
-          for(int m = 0; m < 5; m++){
-            int index = m*5 + n;
-            int a = i + m - 2;
-            int b = j + n - 2;
+    for(int i = o_halfsize; i < (nrows - o_halfsize); i++){
 
-            if(abs(data(a, b) - naVal) > 0){
-              // If the value is not missing, add to the miniMatrix
-              O_miniMatrix[index] = data(a, b);
-            }else{
-              // Otherwise, if it's missing, replace it with naVal and increase the counter
-              O_miniMatrix[index] = naVal;
-              O_naCounter++;
-            }
-          }
-        }
+      // Defining cell value
+      double cellValue = data(i, j);
 
-        // Build outer minimatrix (checking NA)
-        int I_naCounter = 0;
-        for(int n = 0; n < 3; n++){
-          for(int m = 0; m < 3; m++){
-            int index = m*3 + n;
-            int a = i + m - 1;
-            int b = j + n - 1;
+      // Create outputs for Outer and Inner mini matrix
+      NumericMatrix O_miniMatrix = data(Range(i - o_halfsize, i + o_halfsize),
+                                        Range(j - o_halfsize, j + o_halfsize));
+      NumericMatrix I_miniMatrix = data(Range(i - i_halfsize, i + i_halfsize),
+                                        Range(j - i_halfsize, j + i_halfsize));
 
-            if(abs(data(a, b) - naVal) > 0){
-              // If the value is not missing, add to the miniMatrix
-              I_miniMatrix[index] = data(a, b);
-            }else{
-              // Otherwise, if it's missing, replace it with naVal and increase the counter
-              I_miniMatrix[index] = naVal;
-              I_naCounter++;
-            }
-          }
-        }
+      // If some of the inner matrices are full of NA, pass to the next cell
+      if((all(is_na(O_miniMatrix)) + all(is_na(I_miniMatrix))) > 0) continue;
 
-        if((O_naCounter < 25) && (I_naCounter < 9)){
+      // If the cell value IS NOT A NA, evaluating if it is an extreme value for
+      // a 3x3 and 5x5 matrix neightborhood
+      if(!NumericVector::is_na(cellValue)){
 
-          // Set a counter for outer slices
-          int outerTag = 0;
+        // PEAK-5 SEARCH
+        // Set a counter for slices
+        int peak5 = 0;
 
-          ////////////////////// N-S slice //////////////////////
-          // Subset from outer mini matrix
-          NumericVector tempVector = O_miniMatrix[ns_outer];
-          tempVector = tempVector[tempVector < naVal];
+        ////////////////////// W-E slice //////////////////////
+        peak5 += is_extreme(O_miniMatrix, 1);
 
-          // Search for min & max
-          double maxElement = max(tempVector);
-          double minElement = min(tempVector);
-          double tempValDou = data(i, j);
+        ////////////////////// N-S slice //////////////////////
+        peak5 += is_extreme(O_miniMatrix, 2);
 
-          // If some min or max was found, increase the counter
-          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
-            outerTag++;
-          }
+        ////////////////////// NW-SE slice //////////////////////
+        peak5 += is_extreme(O_miniMatrix, 3);
 
-          ////////////////////// W-E slice //////////////////////
-          // Subset from outer mini matrix
-          tempVector = O_miniMatrix[we_outer];
-          tempVector = tempVector[tempVector < naVal];
+        ////////////////////// NE-SW slice //////////////////////
+        peak5 += is_extreme(O_miniMatrix, 4);
 
-          maxElement = max(tempVector);
-          minElement = min(tempVector);
-          tempValDou = data(i, j);
+        // Defining tag of peak-5
+        bool peak5_tag = (peak5 == 4);
 
-          // If some min or max was found, increase the counter
-          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
-            outerTag++;
-          }
 
-          ////////////////////// NW-SE slice //////////////////////
-          // Subset from outer mini matrix
-          tempVector = O_miniMatrix[nwse_outer];
-          tempVector = tempVector[tempVector < naVal];
+        // ---------------------------------------------------------------------
+        // 2. Check for peaks and troughs within 1D 3-point slices through
+        // sliding 3x3 window. The window slides west-east, north-south across
+        // the matrix:
 
-          maxElement = max(tempVector);
-          minElement = min(tempVector);
-          tempValDou = data(i, j);
+        // PEAK-3 SEARCH
+        // Set a counter for slices
+        int peak3 = 0;
 
-          // If some min or max was found, increase the counter
-          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
-            outerTag++;
-          }
+        ////////////////////// W-E slice //////////////////////
+        peak3 += is_extreme(I_miniMatrix, 1);
 
-          ////////////////////// NE-SW slice //////////////////////
-          // Subset from outer mini matrix
-          tempVector = O_miniMatrix[nesw_outer];
-          tempVector = tempVector[tempVector < naVal];
+        ////////////////////// N-S slice //////////////////////
+        peak3 += is_extreme(I_miniMatrix, 2);
 
-          maxElement = max(tempVector);
-          minElement = min(tempVector);
-          tempValDou = data(i, j);
+        // Defining tag of peak-5
+        bool peak3_tag = (peak3 == 2);
 
-          // If some min or max was found, increase the counter
-          if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
-            outerTag++;
-          }
 
-          // Check if data(i, j) has been a max or min along 4 slices for outer kernel
-          if(outerTag == 0){
-            emptyData(i, j) = data(i, j);
-          }else{
-            /////////////////////// N-S slice //////////////////////
-            // Subset from inner mini matrix considering only WE and NS slices
-            NumericVector tempVector = I_miniMatrix[index_inner];
+        // ---------------------------------------------------------------------
+        // 3. Apply the selective 2D 3x3 median filter within sliding 3x3 window.
+        // If the window center is a significant 5-point extremum (Peak-5),
+        // leave it intact (do not blunt it with median filter), otherwise if
+        // the window center is a spike (Peak-3) use the 2D 3x3 median filter:
+        if(!peak5_tag && peak3_tag){
 
-            // Remove NA values
-            tempVector = tempVector[tempVector < naVal];
+          // Calculate median of inner matrix
+          NumericVector outVal = na_omit(as<NumericVector>(I_miniMatrix));
 
-            maxElement = max(tempVector);
-            minElement = min(tempVector);
-            tempValDou = data(i, j);
-
-            // If some min or max was found, increase the counter
-            // Check if data(i, j) has been a max or min along 4 slices for inner kernel
-            if((abs(tempValDou - minElement) < 1e-6) || (abs(tempValDou - maxElement) < 1e-6)){
-              // Sort values
-              I_miniMatrix.sort();
-
-              // Convert probs to an index
-              int validPositions = (9 - I_naCounter);
-
-              // Get the index for middle position
-              int index = (int)round(std::floor(validPositions*0.5));
-
-              // If the length of valid values vector is even, get the middle position value
-              double tempValue = I_miniMatrix[index];
-              if(validPositions % 2 == 0){
-                // Otherwise, if it's even, calculate the average with the following value
-                tempValue = (tempValue + I_miniMatrix[index - 1])/2;
-              }
-
-              // Put the median value of the Inner miniMatrix
-              emptyData(i, j) = tempValue;
-            }else{
-              emptyData(i, j) = data(i, j);
-            }
-          }
+          // Replace the corresponding position in the output matrix
+          emptyData(i, j) = Rcpp::median(outVal);
+        }else{
+          emptyData(i, j) = cellValue;
         }
       }
     }
@@ -429,245 +410,3 @@ NumericMatrix engine5(NumericMatrix data, int naVal){
   return emptyData;
 }
 
-// ENGINE 6: General Contextual Median Filter
-// NumericMatrix engine5(NumericMatrix data, double probs, int I_radius, int O_radius, int naVal){
-//   int nrows = data.nrow();
-//   int ncols = data.ncol();
-//
-//   // Create a NA matrix for output
-//   NumericMatrix emptyData(nrows, ncols);
-//   std::fill(emptyData.begin(), emptyData.end(), NA_REAL);
-//
-//   double I_halfRadiusDouble = std::floor(I_radius/2);
-//   int I_halfRadius = (int)round(I_halfRadiusDouble);
-//
-//   double O_halfRadiusDouble = std::floor(O_radius/2);
-//   int O_halfRadius = (int)round(O_halfRadiusDouble);
-//
-//   int O_minimatrixSize = O_radius*O_radius;
-//   int I_minimatrixSize = I_radius*I_radius;
-//
-//   // OUTER INDEX
-//   // N-S split outer matrix
-//   IntegerVector ns_outer(O_radius);
-//   int index = 0;
-//   for(int i = O_halfRadius; i < O_minimatrixSize; i = i + O_radius){
-//     ns_outer(index) = i;
-//     index++;
-//   }
-//
-//   // W-E split outer matrix
-//   IntegerVector we_outer(O_radius);
-//   index = 0;
-//   for(int i = O_radius*O_halfRadius; i < O_radius*(O_halfRadius + 1); i++){
-//     we_outer(index) = i;
-//     index++;
-//   }
-//
-//   // NW-SE split outer matrix
-//   IntegerVector nwse_outer(O_radius);
-//   index = 0;
-//   for(int i = 0; i < O_minimatrixSize; i = i + O_radius + 1){
-//     nwse_outer(index) = i;
-//     index++;
-//   }
-//
-//   // NE-SW split outer matrix
-//   IntegerVector nesw_outer(O_radius);
-//   index = 0;
-//   for(int i = O_radius - 1; i < (O_minimatrixSize - 1); i = i + O_radius - 1){
-//     nesw_outer(index) = i;
-//     index++;
-//   }
-//
-//
-//   // INNER INDEX
-//   // N-S split inner matrix
-//   IntegerVector ns_inner(I_radius);
-//   index = 0;
-//   for(int i = I_halfRadius; i < I_minimatrixSize; i = i + I_radius){
-//     ns_inner(index) = i;
-//     index++;
-//   }
-//
-//   // W-E split inner matrix
-//   IntegerVector we_inner(I_radius);
-//   index = 0;
-//   for(int i = I_radius*I_halfRadius; i < I_radius*(I_halfRadius + 1); i++){
-//     we_inner(index) = i;
-//     index++;
-//   }
-//
-//   for(int j = O_halfRadius; j < (ncols - O_halfRadius); j++){
-//     for(int i = O_halfRadius; i < (nrows - O_halfRadius); i++){
-//       // If cell data(i, j) is missing, avoid it
-//       if(abs(data(i, j) - naVal) > 0){
-//         // Create outputs for Outer and Inner mini matrix
-//         NumericVector O_miniMatrix(O_minimatrixSize);
-//         NumericVector I_miniMatrix(I_minimatrixSize);
-//
-//         // Build outer minimatrix (checking NA)
-//         int O_naCounter = 0;
-//         for(int n = 0; n < O_radius; n++){
-//           for(int m = 0; m < O_radius; m++){
-//             int index = m*O_radius + n;
-//             int a = i + m - O_halfRadius;
-//             int b = j + n - O_halfRadius;
-//
-//             if(abs(data(a, b) - naVal) > 0){
-//               // If the value is not missing, add to the miniMatrix
-//               O_miniMatrix[index] = data(a, b);
-//             }else{
-//               // Otherwise, if it's missing, replace it with naVal and increase the counter
-//               O_miniMatrix[index] = naVal;
-//               O_naCounter++;
-//             }
-//           }
-//         }
-//
-//         // Build outer minimatrix (checking NA)
-//         int I_naCounter = 0;
-//         for(int n = 0; n < I_radius; n++){
-//           for(int m = 0; m < I_radius; m++){
-//             int index = m*I_radius + n;
-//             int a = i + m - I_halfRadius;
-//             int b = j + n - I_halfRadius;
-//
-//             if(abs(data(a, b) - naVal) > 0){
-//               // If the value is not missing, add to the miniMatrix
-//               I_miniMatrix[index] = data(a, b);
-//             }else{
-//               // Otherwise, if it's missing, replace it with naVal and increase the counter
-//               I_miniMatrix[index] = naVal;
-//               I_naCounter++;
-//             }
-//           }
-//         }
-//
-//         if((O_naCounter < O_minimatrixSize) && (I_naCounter < I_minimatrixSize)){
-//
-//           // Set a counter for outer slices
-//           int outerTag = 0;
-//
-//           ////////////////////// N-S slice //////////////////////
-//           // Subset from outer mini matrix
-//           NumericVector tempVector = O_miniMatrix[ns_outer];
-//           tempVector = tempVector[tempVector < naVal];
-//
-//           // Search for min & max
-//           double maxElement = max(tempVector);
-//           double minElement = min(tempVector);
-//
-//           // If some min or max was found, increase the counter
-//           if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//             outerTag++;
-//           }
-//
-//           ////////////////////// W-E slice //////////////////////
-//           // Subset from outer mini matrix
-//           tempVector = O_miniMatrix[we_outer];
-//           tempVector = tempVector[tempVector < naVal];
-//
-//           // Search for min & max
-//           maxElement = max(tempVector);
-//           minElement = min(tempVector);
-//
-//           // If some min or max was found, increase the counter
-//             if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//             outerTag++;
-//           }
-//
-//           ////////////////////// NW-SE slice //////////////////////
-//           // Subset from outer mini matrix
-//           tempVector = O_miniMatrix[nwse_outer];
-//           tempVector = tempVector[tempVector < naVal];
-//
-//           // Search for min & max
-//           maxElement = max(tempVector);
-//           minElement = min(tempVector);
-//
-//           // If some min or max was found, increase the counter
-//           if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//             outerTag++;
-//           }
-//
-//           ////////////////////// NE-SW slice //////////////////////
-//           // Subset from outer mini matrix
-//           tempVector = O_miniMatrix[nesw_outer];
-//           tempVector = tempVector[tempVector < naVal];
-//
-//           // Search for min & max
-//           maxElement = max(tempVector);
-//           minElement = min(tempVector);
-//
-//           // If some min or max was found, increase the counter
-//           if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//             outerTag++;
-//           }
-//
-//           // Check if data(i, j) has been a max or min along 4 slices for outer kernel
-//           if(outerTag == 4){
-//             emptyData(i, j) = data(i, j);
-//           }else{
-//             // Set a counter for inner slices
-//             int innerTag = 0;
-//
-//             ////////////////////// N-S slice //////////////////////
-//             // Subset from inner mini matrix
-//             NumericVector tempVector = I_miniMatrix[ns_inner];
-//             tempVector = tempVector[tempVector < naVal];
-//
-//             // Search for min & max
-//             double maxElement = max(tempVector);
-//             double minElement = min(tempVector);
-//
-//             // If some min or max was found, increase the counter
-//             if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//               innerTag++;
-//             }
-//
-//             ////////////////////// W-E slice //////////////////////
-//             // Subset from inner mini matrix
-//             tempVector = I_miniMatrix[we_inner];
-//             tempVector = tempVector[tempVector < naVal];
-//
-//             // Search for min & max
-//             maxElement = max(tempVector);
-//             minElement = min(tempVector);
-//
-//             // If some min or max was found, increase the counter
-//             if((data(i, j) == maxElement) | (data(i, j) == minElement)){
-//               innerTag++;
-//             }
-//
-//             // Check if data(i, j) has been a max or min along 4 slices for inner kernel
-//             if(innerTag == 2){
-//               // Sort values
-//               I_miniMatrix.sort();
-//
-//               // Convert probs to an index
-//               int validPositions = (I_minimatrixSize - I_naCounter);
-//
-//               // Get the index for middle position
-//               int index = (int)round(std::floor(validPositions*probs));
-//
-//               // If the length of valid values vector is even, get the middle position value
-//               double tempValue = I_miniMatrix[index];
-//               if(validPositions % 2 == 0){
-//                 // Otherwise, if it's even, calculate the average with the following value
-//                 tempValue = (tempValue + I_miniMatrix[index - 1])/2;
-//               }
-//
-//               // Put the median value of the Inner miniMatrix
-//               emptyData(i, j) = tempValue;
-//             }else{
-//               emptyData(i, j) = data(i, j);
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-//
-//   return emptyData;
-// }

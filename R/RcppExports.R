@@ -2,6 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @importFrom Rcpp evalCpp
+#' @importFrom RcppArmadillo armadillo_version
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
@@ -9,19 +10,19 @@ engine1 <- function(data, kernel) {
     .Call(`_imagine_engine1`, data, kernel)
 }
 
-engine2 <- function(data, kernel, probs, naVal) {
-    .Call(`_imagine_engine2`, data, kernel, probs, naVal)
+engine2 <- function(data, kernel, probs) {
+    .Call(`_imagine_engine2`, data, kernel, probs)
 }
 
 engine3 <- function(data, radius) {
     .Call(`_imagine_engine3`, data, radius)
 }
 
-engine4 <- function(data, radius, probs, naVal) {
-    .Call(`_imagine_engine4`, data, radius, probs, naVal)
+engine4 <- function(data, radius, probs) {
+    .Call(`_imagine_engine4`, data, radius, probs)
 }
 
-engine5 <- function(data, naVal) {
-    .Call(`_imagine_engine5`, data, naVal)
+engine5 <- function(data, i_size = 3L, o_size = 5L) {
+    .Call(`_imagine_engine5`, data, i_size, o_size)
 }
 

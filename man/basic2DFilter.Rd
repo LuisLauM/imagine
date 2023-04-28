@@ -8,38 +8,48 @@
 \usage{
 meanFilter(X, radius, times = 1)
 
-quantileFilter(X, radius, probs, times = 1, na = NA)
+quantileFilter(X, radius, probs, times = 1)
 
-medianFilter(X, radius, times = 1, na = NA)
+medianFilter(X, radius, times = 1)
 }
 \arguments{
 \item{X}{A numeric \code{matrix} object used for apply filters.}
 
-\item{radius}{Size of squared kernel to apply median.}
+\item{radius}{Size of squared or rectangular kernel to apply median. See
+Details.}
 
 \item{times}{How many times do you want to apply the filter?}
 
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
-
-\item{na}{\code{NA} as default. But, if specified, it must be an integer value higher
-than the maximum of \code{X}.}
 }
 \value{
 A \code{matrix} object with the same dimensions of \code{X}.
 
-\code{quantileFilter} don't use a kernel but, for each cell, it returns
-the position
-of quantile 'probs' (value between 0 and 1).
+\code{quantileFilter} don't use a kernel but, for each cell, it
+returns the position of quantile 'probs' (value between 0 and 1).
 
-\code{medianFilter} is a wrapper of \code{quantileFilter} with probs = 0.5.
+\code{medianFilter} is a wrapper of \code{quantileFilter} with
+\code{probs = 0.5}.
 }
 \description{
-This functions take a \code{matrix} object, and for each cell calculate
-mean, median or certain quantile about a squared neighborhood by matrix of dimension
-(\eqn{radius*radius}).
+This functions take a \code{matrix} object, and for each cell
+calculate mean, median or certain quantile around a squared/rectangular
+neighborhood.
 }
 \details{
-Functions use C++ algorithms. More details are shown in the vignette.
+\code{radius} must be defined as a 2-length numeric vector
+specifying the number of rows and columns of the window which will be used to
+make calculations. If the length of radius is 1, the window will be a square.
+
+Functions use C++ algorithms for running some statistical calculations. The
+mean is far obvious, however, there are several ways to perform quantiles.
+\code{quantileFilter} function uses
+\href{https://arma.sourceforge.net/docs.html#quantile}{arma::quantile}: a
+RcppArmadillo function, which is equivalent to use R \link[stats]{quantile}
+funtion with \code{type = 5}.
+
+\code{medianFilter} is a wraper of \code{quantileFilter}, so the same
+observations are applied to it.
 }
 \examples{
 # Generate example matrix

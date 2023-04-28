@@ -19,35 +19,35 @@ convolutionMedian(X, kernel, times = 1)
 
 \item{times}{How many times do you want to apply the filter?}
 
-\item{normalize}{\code{logical} indicating if results will (or not) be normalized.
-See details.}
+\item{normalize}{\code{logical} indicating if results will (or not) be
+normalized. See details.}
 
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
 \value{
-\code{convolution2D} returns a \code{matrix} object with the same dimensions
-of \code{X}.
+\code{convolution2D} returns a \code{matrix} object with the same
+dimensions of \code{X}.
 
-\code{convolutionQuantile} uses the kernel but, for each cell, it returns
-the position
-of quantile 'probs' (value between 0 and 1).
+\code{convolutionQuantile} uses the kernel but, for each cell, it
+returns the position of quantile 'probs' (value between 0 and 1).
 
-\code{convolutionMedian} is a wrapper of \code{convolutionQuantile} with
-probs = 0.5.
+\code{convolutionMedian} is a wrapper of \code{convolutionQuantile}
+with probs = 0.5.
 }
 \description{
-This function takes a \code{matrix} object, and for each cell multiplies
-its neighborhood by the \code{kernel}. Finally, it returns for each cell the mean of
-the kernel-weighted sum.
+This function takes a \code{matrix} object, and for each cell
+multiplies its neighborhood by the \code{kernel}. Finally, it returns for
+each cell the mean of the kernel-weighted sum.
 }
 \details{
-Convolution is a  mathematical operation which allows the multiplication of two arrays
-of numbers, in order to produce an array of numbers of the same dimensionality.
-Valid results (showed in output) will be only those with non-NA values, so NA holes on
-a matrix will expand in the order of the kernel size.
+Convolution is a mathematical operation which allows the multiplication of
+two arrays of numbers, in order to produce an array of numbers of the same
+dimensionality. Valid results (showed in output) will be only those with
+non-NA values, so NA holes on a matrix will expand in the order of the kernel
+size.
 
-Normalization consists on divides the output by the \code{sum(abs(as.numeric(kernel)))}
-(disabled by default).
+Normalization consists on dividing the output in every window calculation by
+the \code{sum(abs(as.numeric(kernel)))} (disabled by default).
 }
 \examples{
 # Generate example matrix
