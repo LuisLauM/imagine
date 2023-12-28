@@ -14,3 +14,4 @@ wbImage
 \code{matrix} object containig numeric data to plot a image. The
 photo was taken by the author on 2016.
 }
+\keyword{datasets}

@@ -32,12 +32,14 @@ install.packages("imagine")
 ```
 
 ## Engines
-`imagine` performs algorithms (called 'engines') written in C++ using **Rcpp** and **RcppArmadillo**, ensuring the faster application of filters. At version 2.0.0, `imagine` includes four main engines, described as follows:
+`imagine` performs algorithms (called 'engines') written in C++ using **Rcpp** and **RcppArmadillo**, ensuring the faster application of filters. Since version 2.1.0, `imagine` includes the following engines:
 
 * Engine 1: Basic 2D-convolution algorithm. It multiplies kernel by the neighborhood of each cell and then it sums all values.
 * Engine 2: Make the same of Engine 1 but, at the end, it returns the position indicated by the parameter `probs`.
 * Engine 3: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and calculates the mean.
 * Engine 4: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and returns the position indicated by the parameter `probs`
+* Engine 5: Contextual Median Filter described in Belkin and O'Reilly (2009) paper <http://dx.doi.org/10.1016/j.jmarsys.2008.11.018>.
+* Engines 6 and 7: Gradient filters proposed by Agenbag et al. (2003) paper <https://doi.org/10.1016/j.pocean.2003.07.004>.
 
 Since version 2.0.0, `radius` could accept 2 values to define the number of rows and columns respectively of the window.
 
