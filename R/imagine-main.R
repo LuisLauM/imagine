@@ -268,7 +268,7 @@ contextualMF <- function(X){
 #' @title Performs gradient algorithms from Agenbag et al. (2003)
 #'
 #' @param X A numeric \code{matrix} object used for apply filters.
-#' @param algorithm \code{numeric} Specifying the type of method that will be
+#' @param algorithm \code{integer} Specifying the type of method that will be
 #' used. See Details.
 #'
 #' @description This function performs two gradient calculation approaches for
@@ -305,7 +305,7 @@ contextualMF <- function(X){
 #' # image(agenbag1)
 #'
 #' # Agenbag, gradient algorithm 2
-#' agenbag2 <- agenbagFilters(X = wbImage, algorithm = 2) |> image()
+#' agenbag2 <- agenbagFilters(X = wbImage, algorithm = 2)
 #'
 #' # image(agenbag2)
 agenbagFilters <- function(X, algorithm = c(1, 2)){

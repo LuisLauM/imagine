@@ -9,7 +9,7 @@ agenbagFilters(X, algorithm = c(1, 2))
 \arguments{
 \item{X}{A numeric \code{matrix} object used for apply filters.}
 
-\item{algorithm}{\code{numeric} Specifying the type of method that will be
+\item{algorithm}{\code{integer} Specifying the type of method that will be
 used. See Details.}
 }
 \value{
@@ -39,7 +39,7 @@ agenbag1 <- agenbagFilters(X = wbImage, algorithm = 1)
 # image(agenbag1)
 
 # Agenbag, gradient algorithm 2
-agenbag2 <- agenbagFilters(X = wbImage, algorithm = 2) |> image()
+agenbag2 <- agenbagFilters(X = wbImage, algorithm = 2)
 
 # image(agenbag2)
 }
