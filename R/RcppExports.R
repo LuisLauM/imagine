@@ -18,8 +18,8 @@ engine6_agenbag1 <- function(data) {
     .Call(`_imagine_engine6_agenbag1`, data)
 }
 
-engine7_agenbag2 <- function(data) {
-    .Call(`_imagine_engine7_agenbag2`, data)
+engine7_agenbag2 <- function(data, threshold = 3L) {
+    .Call(`_imagine_engine7_agenbag2`, data, threshold)
 }
 
 #' @importFrom Rcpp evalCpp

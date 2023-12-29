@@ -40,14 +40,15 @@ multiplies its neighborhood by the \code{kernel}. Finally, it returns for
 each cell the mean of the kernel-weighted sum.
 }
 \details{
-Convolution is a mathematical operation which allows the multiplication of
-two arrays of numbers, in order to produce an array of numbers of the same
-dimensionality. Valid results (showed in output) will be only those with
-non-NA values, so NA holes on a matrix will expand in the order of the kernel
-size.
+Convolution is a mathematical operation that combines two arrays of numbers
+to produce an array of the same structure. The output will consist of only
+valid values, meaning those where both arrays have non-missing data.
+Consequently, any missing values (NAs) in the input matrix will propagate
+outwards to the extent of the convolution kernel.
 
-Normalization consists on dividing the output in every window calculation by
-the \code{sum(abs(as.numeric(kernel)))} (disabled by default).
+Through normalization, the output of each convolution window is scaled by
+dividing it by the sum of the absolute values of the kernel
+(\code{sum(abs(as.numeric(kernel)))}, disabled by default).
 }
 \examples{
 # Generate example matrix

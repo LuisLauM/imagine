@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include <math.h>
 #include <RcppArmadillo.h>
@@ -55,7 +54,7 @@ NumericMatrix engine6_agenbag1(NumericMatrix data){
 
 // ENGINE 7: Agenbag et al (2003)
 // [[Rcpp::export]]
-NumericMatrix engine7_agenbag2(arma::mat data){
+NumericMatrix engine7_agenbag2(arma::mat data, int threshold = 3){
 
   // Get dimension of input matrix
   int nrows = data.n_rows;
@@ -93,7 +92,7 @@ NumericMatrix engine7_agenbag2(arma::mat data){
         }
       }
 
-      if(naCounter < 3){
+      if((radius_row*radius_col - naCounter) >= threshold){
         arma::mat miniMatrix2 = arma::reshape(miniMatrix, miniMatrix.n_elem, 1);
 
         arma::mat quantVal = arma::stddev(miniMatrix2.elem(arma::find_finite(miniMatrix2)), 0, 0);
