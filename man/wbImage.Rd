@@ -5,12 +5,13 @@
 \alias{wbImage}
 \title{Data matrix to be used as example image.}
 \format{
-A \code{matrix} with dimnensions 1280x720.
+A \code{matrix} with dimensions 1280x720.
 }
 \usage{
 wbImage
 }
 \description{
-\code{matrix} object containig numeric data to plot a image. The
-photo was taken by the author on 2016.
+\code{matrix} object containing numeric data to plot a image.
+The photo was taken by the author on 2016.
 }
+\keyword{datasets}

@@ -2,27 +2,57 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @importFrom Rcpp evalCpp
+#' @useDynLib imagine, .registration = TRUE
+NULL
+
+engine1_2dConv <- function(data, kernel) {
+    .Call(`_imagine_engine1_2dConv`, data, kernel)
+}
+
+#' @importFrom Rcpp evalCpp
 #' @importFrom RcppArmadillo armadillo_version
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine1 <- function(data, kernel) {
-    .Call(`_imagine_engine1`, data, kernel)
+engine6_agenbag1 <- function(data) {
+    .Call(`_imagine_engine6_agenbag1`, data)
 }
 
-engine2 <- function(data, kernel, probs) {
-    .Call(`_imagine_engine2`, data, kernel, probs)
+engine7_agenbag2 <- function(data, threshold = 3L) {
+    .Call(`_imagine_engine7_agenbag2`, data, threshold)
 }
 
-engine3 <- function(data, radius) {
-    .Call(`_imagine_engine3`, data, radius)
+#' @importFrom Rcpp evalCpp
+#' @useDynLib imagine, .registration = TRUE
+NULL
+
+engine5_CMF <- function(data, i_size = 3L, o_size = 5L) {
+    .Call(`_imagine_engine5_CMF`, data, i_size, o_size)
 }
 
-engine4 <- function(data, radius, probs) {
-    .Call(`_imagine_engine4`, data, radius, probs)
+#' @importFrom Rcpp evalCpp
+#' @importFrom RcppArmadillo armadillo_version
+#' @useDynLib imagine, .registration = TRUE
+NULL
+
+engine2_convWithQuantiles <- function(data, kernel, probs) {
+    .Call(`_imagine_engine2_convWithQuantiles`, data, kernel, probs)
 }
 
-engine5 <- function(data, i_size = 3L, o_size = 5L) {
-    .Call(`_imagine_engine5`, data, i_size, o_size)
+#' @importFrom Rcpp evalCpp
+#' @useDynLib imagine, .registration = TRUE
+NULL
+
+engine3_meanFilter <- function(data, radius) {
+    .Call(`_imagine_engine3_meanFilter`, data, radius)
+}
+
+#' @importFrom Rcpp evalCpp
+#' @importFrom RcppArmadillo armadillo_version
+#' @useDynLib imagine, .registration = TRUE
+NULL
+
+engine4_quantileFilter <- function(data, radius, probs) {
+    .Call(`_imagine_engine4_quantileFilter`, data, radius, probs)
 }
 

@@ -1,26 +1,28 @@
 ---
-title: "imagine"
-author: "Wencheng Lau-Medrano"
-date: "`r Sys.Date()`"
+title: "imagine-intro"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{imagine}
+  %\VignetteIndexEntry{imagine-intro}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo=FALSE}
-library(imagine)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
+```{r setup}
+library(imagine)
+```
 
 # imagine
 
 **IMAGing engINE, Tools for Application of Image Filters to Data Matrices**
 
-This package was built up to take numeric data matrices and apply image-filtering algoriths.
-
-Algoriths used by `imagine` include median-filter and 2D-convolution based algoriths performed on Rcpp (C++) in order to speed up the application of this filters to large numeric matrices.
+The **imagine** package streamlines the process of applying image-filtering algorithms to numeric data matrices. It employs efficient median-filter and 2D-convolution algorithms implemented in Rcpp (C++), enabling rapid processing of large datasets.
 
 
 ## Installation
@@ -32,12 +34,14 @@ install.packages("imagine")
 ```
 
 ## Engines
-`imagine` performs algorithms (called 'engines') written in C++ using **Rcpp** and **RcppArmadillo**, ensuring the faster application of filters. At version 2.0.0, `imagine` includes four main engines, described as follows:
+The **imagine** package employs C++-based algorithms, designated as 'engines,' crafted with [**Rcpp**](https://cran.r-project.org/package=Rcpp) and [**RcppArmadillo**](https://cran.r-project.org/package=RcppArmadillo), to expedite the application of image filters. These engines significantly enhance the performance of filtering operations, ensuring efficient processing of large datasets. As of version 2.1.0, **imagine** incorporates the following engines:
 
-* Engine 1: Basic 2D-convolution algorithm. It multiplies kernel by the neighborhood of each cell and then it sums all values.
-* Engine 2: Make the same of Engine 1 but, at the end, it returns the position indicated by the parameter `probs`.
+* Engine 1: The basic 2D-convolution operation that involves multiplying a kernel by the neighborhood of each cell and summing the results.
+* Engine 2: it performs the same convolution operation as Engine 1 but returns the position specified by the `probs` parameter.
 * Engine 3: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and calculates the mean.
 * Engine 4: It uses the `radius` argument to extract the values of squared neighborhood ($radius \times radius$) and returns the position indicated by the parameter `probs`
+* Engine 5: Contextual Median Filter described in Belkin and O'Reilly (2009) paper <http://dx.doi.org/10.1016/j.jmarsys.2008.11.018>.
+* Engines 6 and 7: Gradient filters proposed by Agenbag et al. (2003) paper <https://doi.org/10.1016/j.pocean.2003.07.004>.
 
 Since version 2.0.0, `radius` could accept 2 values to define the number of rows and columns respectively of the window.
 
@@ -75,7 +79,7 @@ In order to compare results, we will plot both data (original and filtered) usin
 myMatrix <- wbImage
 
 # Defining color palette
-cols <- gray.colors(n = 1e3, start = 0, end = 1)
+cols <- gray.colors(n = 1e3, start = 1, end = 0)
 
 # Build kernels
 # Kernel 1: For bottom edge recognition
@@ -86,13 +90,13 @@ kernel1 <- matrix(c(-1, -2, -1,
 
 # Kernel 2: Diagonal weighting
 kernel2 <- matrix(c(-2, 0, 0,
-                    0, 1, 0,
-                    0, 0, 2), 
+                     0, 1, 0,
+                     0, 0, 2), 
                   nrow = 3)
 
 # Apply filters
 convolutionExample  <- convolution2D(X = myMatrix, kernel = kernel1)
-convQuantileExample <- convolutionQuantile(X = myMatrix, kernel = kernel2, probs = 0.1)
+convQuantileExample <- convolutionQuantile(X = myMatrix, kernel = kernel2, probs = 0.8)
 
 # Make plots
 par(mar = c(0, 0.5, 0, 0.5), oma = c(0, 0, 2, 0), mfrow = c(2, 1))
@@ -121,7 +125,6 @@ radius <- 3
 meanfilterExample     <- meanFilter(X = myMatrix, radius = radius)
 quantilefilterExample <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
 medianfilterExample   <- medianFilter(X = myMatrix, radius = radius)
-
 ```
 
 Now, we will plot both data (original and filtered) using `image` function, as shows in figures 1 and 2.
@@ -141,8 +144,8 @@ naIndex <- sample(x = seq(prod(dim(myMatrix))), size = as.integer(0.4*prod(dim(m
 myMatrix[naIndex] <- NA
 
 # Apply filters
-meanfilterExample     <- meanFilter(X = myMatrix, radius = 3)
-medianfilterExample   <- medianFilter(X = myMatrix, radius = 3)
+meanfilterExample   <- meanFilter(X = myMatrix, radius = 3)
+medianfilterExample <- medianFilter(X = myMatrix, radius = 3)
 
 # Make plots
 par(mar = rep(0, 4), oma = rep(0.5, 4), mfrow = c(2, 2))
@@ -174,13 +177,16 @@ medianFilter(X = wbImage, radius = 5, times = 50)
 
 
 ```{r, message=FALSE, fig.height=5, fig.width=7.5, fig.cap = "Figure 3: Filters with several time settings", results='hide', fig.pos="h", echo=FALSE}
+
+times <- c(1, 5, 15)
+
 # Defining color palette
 cols <- gray.colors(n = 1e3, start = 0, end = 1)
 
 # Apply filters
-median_times01   <- medianFilter(X = wbImage, radius = 5)
-median_times10   <- medianFilter(X = wbImage, radius = 5, times = 10)
-median_times50   <- medianFilter(X = wbImage, radius = 5, times = 50)
+median_times1 <- medianFilter(X = wbImage, radius = 5, times = times[1])
+median_times2 <- medianFilter(X = wbImage, radius = 5, times = times[2])
+median_times3 <- medianFilter(X = wbImage, radius = 5, times = times[3])
 
 # Make plots
 par(mar = rep(0, 4), oma = rep(0.5, 4), mfrow = c(2, 2))
@@ -188,16 +194,25 @@ par(mar = rep(0, 4), oma = rep(0.5, 4), mfrow = c(2, 2))
 image(wbImage, col = cols, axes = FALSE)
 mtext(text = "Original", side = 3, line = -1.5, font = 2, adj = 0.99)
 
-image(median_times01, col = cols, axes = FALSE)
-mtext(text = "2D median filter\ntimes = 01", side = 3, line = -2.5, 
-      font = 2, adj = 0.99)
+image(median_times1, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[1]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
 
-image(median_times10, col = cols, axes = FALSE)
-mtext(text = "2D median filter\ntimes = 10", side = 3, line = -2.5, 
-      font = 2, adj = 0.99)
+image(median_times2, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[2]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
 
-image(median_times50, col = cols, axes = FALSE)
-mtext(text = "2D median filter\ntimes = 50", side = 3, line = -2.5, 
-      font = 2, adj = 0.99)
+image(median_times3, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[3]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
 ```
 
+## Filters based on published articles
+
+Since its version 2.1.0, `imagine` includes two functions that implement the algorithms of two papers related to the calculation of oceanographic gradients: 
+
+* `contextualMF`: Based on pseudocode provided in Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic front detection in chlorophyll and SST satellite imagery. Journal of Marine Systems, 78(3), 319-326. <https://doi.org/10.1016/j.jmarsys.2008.11.018>
+
+* `agenbagFilters`: Based on Agenbag, J. J., Richardson, A. J., Demarcq, H., Freon, P., Weeks, S., & Shillington, F. A. (2003). Estimating environmental preferences of South African pelagic fish species using catch size- and remote sensing data. Progress in Oceanography, 59(2-3), 275-300. <https://doi.org/10.1016/j.pocean.2003.07.004>
+
+Although both functions are available and can be executed directly from **imagine**, it is recommended to use them through the [**grec**](https://cran.r-project.org/package=grec) package.

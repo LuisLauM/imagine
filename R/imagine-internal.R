@@ -6,6 +6,7 @@ checkArgs <- function(imagineArgs, type){
                    meanFilter          = checkArgs_meanFilter(imagineArgs),
                    quantileFilter      = checkArgs_quantileFilter(imagineArgs),
                    contextualMF        = checkArgs_contextualMF(imagineArgs),
+                   agenbagFilters      = checkArgs_agenbagFilters(imagineArgs),
                    "Invalid value for 'type'.")
 
   return(output)
@@ -163,6 +164,22 @@ checkArgs_contextualMF <- function(allArgs){
 
   if(!is.matrix(X) || !is.numeric(X)){
     stop("'X' must be a numeric matrix.")
+  }
+
+  return(allArgs)
+}
+
+checkArgs_agenbagFilters <- function(allArgs){
+
+  X <- allArgs$X
+  algorithm <- as.numeric(allArgs$algorithm[1])
+
+  if(!is.matrix(X) || !is.numeric(X)){
+    stop("'X' must be a numeric matrix.")
+  }
+
+  if(length(algorithm) != 1 || is.na(algorithm) || !algorithm %in% 1:2){
+    stop("'algorithm' argument only accepts next numeric values: 1 or 2.")
   }
 
   return(allArgs)

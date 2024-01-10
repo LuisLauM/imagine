@@ -14,9 +14,9 @@ contextualMF(X)
 dimensions of \code{X}.
 }
 \description{
-This function performs the Contextual Median Filter (CMF)
-algorithm proposed by Belkin & O'Reilly (2009), based on the pseudo-code
-written on the paper.
+This function implements the Contextual Median Filter (CMF)
+algorithm, which was first described by Belkin & O'Reilly (2009), following
+the pseudocode provided in their paper.
 }
 \details{
 Following the definition of CMF, since \strong{imagine} v.2.0.0, \code{times}
@@ -25,6 +25,14 @@ argument will not be available anymore.
 \strong{imagine} offers the CMF algorithm but for the using to find out
 oceanographic fronts, it is recommended to see and use the functions of the
 \href{https://CRAN.R-project.org/package=grec}{\strong{grec}} package.
+}
+\examples{
+data(wbImage)
+
+# Agenbag, gradient algorithm 1
+cmdOut <- agenbagFilters(X = wbImage, algorithm = 1)
+
+# image(cmdOut)
 }
 \references{
 Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic

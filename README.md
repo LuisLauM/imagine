@@ -61,6 +61,12 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 ## Versions
 
+### v. 2.1.0
+
+-   Reorganization of the engines' code into separate files.
+-   Adding new function (`agenbagFilters`) that performs two methods for gradient calculation.
+-   Some minor improvements in documentation, vignettes and code.
+
 ### v. 2.0.0
 
 -   Important corrections, improvements and changes in engines 2, 4 and 5, so as in functions `convolutionQuantile`, `convolutionMedian`, `quantileFilter` and `contextualMF`.

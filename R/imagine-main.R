@@ -1,16 +1,11 @@
-#' @title IMAGing engINE, Tools for application of image filters to data matrices
-#'
-#' @author Wencheng Lau-Medrano, \email{luis.laum@gmail.com}
-#' @name image-package
-#' @description Provides fast application of image filters to data matrices,
-#' using R and C++ algorithms.
-#' @details This package uses C++ algorithms called 'engines'. More details are
-#' shown in the vignette.
-#' @aliases imagine-package imagine
-#' @docType package
-#' @concept image-matrix
-#' @concept image-filter
-NULL
+#' @title Data matrix to be used as example image.
+#' @description \code{matrix} object containing numeric data to plot a image.
+#' The photo was taken by the author on 2016.
+#' @docType data
+#' @usage wbImage
+#' @format A \code{matrix} with dimensions 1280x720.
+"wbImage"
+
 
 #' @title Make convolution calculations from numeric matrix
 #'
@@ -31,14 +26,16 @@ NULL
 #' dimensions of \code{X}.
 #'
 #' @details
-#' Convolution is a mathematical operation which allows the multiplication of
-#' two arrays of numbers, in order to produce an array of numbers of the same
-#' dimensionality. Valid results (showed in output) will be only those with
-#' non-NA values, so NA holes on a matrix will expand in the order of the kernel
-#' size.
+#' Convolution is a mathematical operation that combines two arrays of numbers
+#' to produce an array of the same structure. The output will consist of only
+#' valid values, meaning those where both arrays have non-missing data.
+#' Consequently, any missing values (NAs) in the input matrix will propagate
+#' outwards to the extent of the convolution kernel.
 #'
-#' Normalization consists on dividing the output in every window calculation by
-#' the \code{sum(abs(as.numeric(kernel)))} (disabled by default).
+#' Through normalization, the output of each convolution window is scaled by
+#' dividing it by the sum of the absolute values of the kernel
+#' (\code{sum(abs(as.numeric(kernel)))}, disabled by default).
+#'
 #'
 #' @export
 #'
@@ -72,14 +69,14 @@ convolution2D <- function(X, kernel, times = 1, normalize = FALSE){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine1(data = output, kernel = kernel))
+    output <- with(checkedArgs, engine1_2dConv(data = output, kernel = kernel))
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
     }
   }
 
-  return(output)
+  output
 }
 
 #' @rdname convolutions
@@ -98,14 +95,14 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
     gc(reset = TRUE)
 
     output <- with(checkedArgs,
-                   engine2(data = output, kernel = kernel, probs = probs))
+                   engine2_convWithQuantiles(data = output, kernel = kernel, probs = probs))
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
     }
   }
 
-  return(output)
+  output
 }
 
 
@@ -115,9 +112,7 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
 #' @export
 convolutionMedian <- function(X, kernel, times = 1){
 
-  output <- convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
-
-  return(output)
+  convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
 }
 
 
@@ -185,10 +180,10 @@ meanFilter <- function(X, radius, times = 1){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine3(data = output, radius = radius))
+    output <- with(checkedArgs, engine3_meanFilter(data = output, radius = radius))
   }
 
-  return(output)
+  output
 }
 
 
@@ -212,10 +207,10 @@ quantileFilter <- function(X, radius, probs, times = 1){
     gc(reset = TRUE)
 
     output <- with(checkedArgs,
-                   engine4(data = output, radius = radius, probs = probs))
+                   engine4_quantileFilter(data = output, radius = radius, probs = probs))
   }
 
-  return(output)
+  output
 }
 
 
@@ -225,19 +220,17 @@ quantileFilter <- function(X, radius, probs, times = 1){
 #' @export
 medianFilter <- function(X, radius, times = 1){
 
-  output <- quantileFilter(X = X, radius = radius, probs = 0.5, times = times)
-
-  return(output)
+  quantileFilter(X = X, radius = radius, probs = 0.5, times = times)
 }
 
 
-#' Performs Contextual Median Filter
+#' @title Performs Contextual Median Filter
 #'
 #' @param X A numeric \code{matrix} object used for apply filters.
 #'
-#' @description This function performs the Contextual Median Filter (CMF)
-#' algorithm proposed by Belkin & O'Reilly (2009), based on the pseudo-code
-#' written on the paper.
+#' @description This function implements the Contextual Median Filter (CMF)
+#' algorithm, which was first described by Belkin & O'Reilly (2009), following
+#' the pseudocode provided in their paper.
 #'
 #' @details
 #' Following the definition of CMF, since \strong{imagine} v.2.0.0, \code{times}
@@ -255,6 +248,14 @@ medianFilter <- function(X, radius, times = 1){
 #'
 #' @return \code{contextualMF} returns a \code{matrix} object with the same
 #' dimensions of \code{X}.
+#'
+#' @examples
+#' data(wbImage)
+#'
+#' # Agenbag, gradient algorithm 1
+#' cmdOut <- agenbagFilters(X = wbImage, algorithm = 1)
+#'
+#' # image(cmdOut)
 contextualMF <- function(X){
 
   # Check and validation of arguments
@@ -262,17 +263,77 @@ contextualMF <- function(X){
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "contextualMF")
 
   # Apply filters
-  output <- with(checkedArgs, engine5(data = X))
-
-  return(output)
+  with(checkedArgs, engine5_CMF(data = X))
 }
 
-#' @title Data matrix to be used as example image.
-#' @name wbImage
-#' @description \code{matrix} object containig numeric data to plot a image. The
-#' photo was taken by the author on 2016.
-#' @aliases wbImage
-#' @docType data
-#' @usage wbImage
-#' @format A \code{matrix} with dimnensions 1280x720.
-NULL
+
+#' @title Performs algorithms from Agenbag et al. (2003)
+#'
+#' @param X A numeric \code{matrix} used as main input.
+#' @param algorithm \code{integer} specifying the type of method that will be
+#' used. See Details.
+#' @param ... Not used.
+#'
+#' @description This function performs two (gradient) calculation approaches for
+#' SST, as outlined in the paper by Agenbag et al. (2003).
+#'
+#' @details
+#' Section 2.2.4 of the paper by Agenbag et al. (2003) introduces the following
+#' two methods:
+#' \describe{
+#'  \item{\strong{Method 1: }}{Based on the equation
+#'  \deqn{Y_{i,j}=\sqrt{(X_{i+1,j}-X_{i-1,j})^2 +(X_{i,j+1}-X_{i,j-1})^2}}}
+#'  where \eqn{Y_{i,j}} represents the output value for each \eqn{X_{i,j}} pixel value
+#'  of a given \eqn{X} matrix.
+#'  \item{\strong{Method 2: }}{the standard deviation in a 3x3 pixel area centered on
+#'  position \eqn{(i,j)}.}
+#' }
+#'
+#' As outlined in the original study, this method conducts searches within a
+#' 1-pixel vicinity of each point. For method 1, it only returns a value for
+#' points where none of the four involved values are NA. Conversely, for method
+#' 2, the standard deviation calculation is performed only for points where at
+#' least 3 non-NA values are found in the 3x3 neighborhood.
+#'
+#'
+#' @references Agenbag, J.J., A.J. Richardson, H. Demarcq, P. Freon, S. Weeks,
+#' and F.A. Shillington. "Estimating Environmental Preferences of South African
+#' Pelagic Fish Species Using Catch Size- and Remote Sensing Data". Progress in
+#' Oceanography 59, No 2-3 (October 2003): 275-300.
+#' (\doi{https://doi.org/10.1016/j.pocean.2003.07.004}).
+#'
+#' @return \code{agenbagFilters} returns a \code{matrix} object with the same
+#' dimensions of \code{X}.
+#'
+#' @export
+#'
+#' @examples
+#' data(wbImage)
+#'
+#' # Agenbag, method 1
+#' agenbag1 <- agenbagFilters(X = wbImage, algorithm = 1)
+#'
+#' # Agenbag, method 2
+#' agenbag2 <- agenbagFilters(X = wbImage, algorithm = 2)
+#'
+#' # Plotting results
+#' par(mfrow = c(3, 1), mar = rep(0, 4))
+#'
+#' # Original
+#' image(wbImage, axes = FALSE, col = gray.colors(n = 1e3))
+#'
+#' # Calculated
+#' cols <- hcl.colors(n = 1e3, palette = "YlOrRd", rev = TRUE)
+#' image(agenbag1, axes = FALSE, col = cols)
+#' image(agenbag2, axes = FALSE, col = cols)
+agenbagFilters <- function(X, algorithm = c(1, 2), ...){
+
+  # Check and validation of arguments
+  checkedArgs <- list(X = X,
+                      algorithm = algorithm)
+  checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "agenbagFilters")
+
+  switch(checkedArgs$algorithm,
+         "1" = engine6_agenbag1(data = checkedArgs$X),
+         "2" = engine7_agenbag2(data = checkedArgs$X, ...))
+}

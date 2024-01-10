@@ -64,3 +64,6 @@ vignettes/*.pdf
 /.project
 /src-i386
 /src-x64
+inst/doc
+/doc/
+/Meta/
