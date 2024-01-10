@@ -280,7 +280,7 @@ contextualMF <- function(X){
 #' @details
 #' Section 2.2.4 of the paper by Agenbag et al. (2003) introduces the following
 #' two methods:
-#' \itemize{
+#' \describe{
 #'  \item{\strong{Method 1: }}{Based on the equation
 #'  \deqn{Y_{i,j}=\sqrt{(X_{i+1,j}-X_{i-1,j})^2 +(X_{i,j+1}-X_{i,j-1})^2}}}
 #'  where \eqn{Y_{i,j}} represents the output value for each \eqn{X_{i,j}} pixel value

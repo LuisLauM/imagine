@@ -65,7 +65,7 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 -   Reorganization of the engines' code into separate files.
 -   Adding new function (`agenbagFilters`) that performs two methods for gradient calculation.
--   Some minor improvements in documentation and code.
+-   Some minor improvements in documentation, vignettes and code.
 
 ### v. 2.0.0
 
