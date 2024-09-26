@@ -14,7 +14,7 @@ using namespace Rcpp;
 
 // ENGINE 4: Quantile filter
 // [[Rcpp::export]]
-NumericMatrix engine4_quantileFilter(arma::mat data, NumericVector radius, arma::vec probs){
+NumericMatrix engine4_quantileFilter(arma::mat data, NumericVector radius, arma::vec probs, bool na_only){
 
   // Get dimension of input matrix
   int nrows = data.n_rows;
@@ -36,6 +36,13 @@ NumericMatrix engine4_quantileFilter(arma::mat data, NumericVector radius, arma:
 
   for(int j = halfRadius_col; j < (ncols - halfRadius_col); j++){
     for(int i = halfRadius_row; i < (nrows - halfRadius_row); i++){
+
+      if(na_only){
+        if(!std::isnan(data(i, j))){
+          emptyData(i, j) = data(i, j);
+          continue;
+        }
+      }
 
       int naCounter = 0;
       for(int n = 0; n < radius_col; n++){

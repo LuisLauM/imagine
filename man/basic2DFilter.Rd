@@ -6,11 +6,11 @@
 \alias{medianFilter}
 \title{Make a 2D filter calculations from numeric matrix}
 \usage{
-meanFilter(X, radius, times = 1)
+meanFilter(X, radius, times = 1, na_only = FALSE)
 
-quantileFilter(X, radius, probs, times = 1)
+quantileFilter(X, radius, probs, times = 1, na_only = FALSE)
 
-medianFilter(X, radius, times = 1)
+medianFilter(X, radius, times = 1, na_only = FALSE)
 }
 \arguments{
 \item{X}{A numeric \code{matrix} object used for apply filters.}
@@ -19,6 +19,9 @@ medianFilter(X, radius, times = 1)
 Details.}
 
 \item{times}{How many times do you want to apply the filter?}
+
+\item{na_only}{\code{logical}, Do you want to apply the filter ONLY in cells
+with NA?}
 
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
@@ -50,6 +53,10 @@ funtion with \code{type = 5}.
 
 \code{medianFilter} is a wraper of \code{quantileFilter}, so the same
 observations are applied to it.
+
+\code{na_only} performs two actions at once: (1) it applies the filter only in
+the positions where the original value is \code{NA} and (2) for the rest of
+the cells, it is replaced with the value of the original matrix.
 }
 \examples{
 # Generate example matrix

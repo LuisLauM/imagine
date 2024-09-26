@@ -10,7 +10,7 @@ using namespace Rcpp;
 
 // ENGINE 1: 2D convolution
 // [[Rcpp::export]]
-NumericMatrix engine1_2dConv(NumericMatrix data, NumericMatrix kernel){
+NumericMatrix engine1_2dConv(NumericMatrix data, NumericMatrix kernel, bool na_only){
 
   // Get dimension of input matrix
   int nrows = data.nrow();
@@ -37,6 +37,13 @@ NumericMatrix engine1_2dConv(NumericMatrix data, NumericMatrix kernel){
 
   for(int j = knlColHalf; j < (ncols - knlColHalf); j++){
     for(int i = knlRowHalf; i < (nrows - knlRowHalf); i++){
+
+      if(na_only){
+        if(!std::isnan(data(i, j))){
+          emptyData(i, j) = data(i, j);
+          continue;
+        }
+      }
 
       double cumSum = 0;
       int naCounter = 0;

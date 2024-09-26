@@ -10,7 +10,7 @@ using namespace Rcpp;
 
 // ENGINE 3: Mean filter
 // [[Rcpp::export]]
-NumericMatrix engine3_meanFilter(NumericMatrix data, NumericVector radius){
+NumericMatrix engine3_meanFilter(NumericMatrix data, NumericVector radius, bool na_only){
 
   // Get dimension of input matrix
   int nrows = data.nrow();
@@ -36,6 +36,13 @@ NumericMatrix engine3_meanFilter(NumericMatrix data, NumericVector radius){
   // Loop along every cell of original matrix
   for(int j = halfRadius_col; j < (ncols - halfRadius_col); j++){
     for(int i = halfRadius_row; i < (nrows - halfRadius_row); i++){
+
+      if(na_only){
+        if(!std::isnan(data(i, j))){
+          emptyData(i, j) = data(i, j);
+          continue;
+        }
+      }
 
       // Initialize cumsum of window values (cumSum) and no-NA values (k)
       double cumSum = 0;

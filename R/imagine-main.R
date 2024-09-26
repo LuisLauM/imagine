@@ -17,6 +17,8 @@
 #' @param times How many times do you want to apply the filter?
 #' @param normalize \code{logical} indicating if results will (or not) be
 #' normalized. See details.
+#' @param na_only \code{logical}, Do you want to apply the filter ONLY in cells
+#' with NA?
 #'
 #' @description This function takes a \code{matrix} object, and for each cell
 #' multiplies its neighborhood by the \code{kernel}. Finally, it returns for
@@ -35,6 +37,10 @@
 #' Through normalization, the output of each convolution window is scaled by
 #' dividing it by the sum of the absolute values of the kernel
 #' (\code{sum(abs(as.numeric(kernel)))}, disabled by default).
+#'
+#' \code{na_only} performs two actions at once: (1) it applies the filter only in
+#' the positions where the original value is \code{NA} and (2) for the rest of
+#' the cells, it is replaced with the value of the original matrix.
 #'
 #'
 #' @export
@@ -56,7 +62,7 @@
 #' image(myMatrix, zlim = c(0, 100))
 #' image(myOutput1, zlim = c(0, 100))
 #' image(myOutput2, zlim = c(0, 100))
-convolution2D <- function(X, kernel, times = 1, normalize = FALSE){
+convolution2D <- function(X, kernel, times = 1, normalize = FALSE, na_only = FALSE){
 
   armadillo_version(FALSE)
 
@@ -69,7 +75,10 @@ convolution2D <- function(X, kernel, times = 1, normalize = FALSE){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine1_2dConv(data = output, kernel = kernel))
+    output <- with(checkedArgs,
+                   engine1_2dConv(data = output,
+                                  kernel = kernel,
+                                  na_only = isTRUE(na_only)))
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
@@ -83,7 +92,7 @@ convolution2D <- function(X, kernel, times = 1, normalize = FALSE){
 #' @return \code{convolutionQuantile} uses the kernel but, for each cell, it
 #' returns the position of quantile 'probs' (value between 0 and 1).
 #' @export
-convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
+convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE, na_only = FALSE){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X, kernel = kernel, probs = probs, times = times)
@@ -95,7 +104,10 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
     gc(reset = TRUE)
 
     output <- with(checkedArgs,
-                   engine2_convWithQuantiles(data = output, kernel = kernel, probs = probs))
+                   engine2_convWithQuantiles(data = output,
+                                             kernel = kernel,
+                                             probs = probs,
+                                             na_only = isTRUE(na_only)))
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
@@ -110,9 +122,13 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE){
 #' @return \code{convolutionMedian} is a wrapper of \code{convolutionQuantile}
 #' with probs = 0.5.
 #' @export
-convolutionMedian <- function(X, kernel, times = 1){
+convolutionMedian <- function(X, kernel, times = 1, na_only = FALSE){
 
-  convolutionQuantile(X = X, kernel = kernel, probs = 0.5, times = times)
+  convolutionQuantile(X = X,
+                      kernel = kernel,
+                      probs = 0.5,
+                      times = times,
+                      na_only = isTRUE(na_only))
 }
 
 
@@ -125,6 +141,8 @@ convolutionMedian <- function(X, kernel, times = 1){
 #' Details.
 #' @param probs \code{numeric} vector of probabilities with values in [0,1].
 #' @param times How many times do you want to apply the filter?
+#' @param na_only \code{logical}, Do you want to apply the filter ONLY in cells
+#' with NA?
 #'
 #' @description This functions take a \code{matrix} object, and for each cell
 #' calculate mean, median or certain quantile around a squared/rectangular
@@ -145,6 +163,10 @@ convolutionMedian <- function(X, kernel, times = 1){
 #'
 #' \code{medianFilter} is a wraper of \code{quantileFilter}, so the same
 #' observations are applied to it.
+#'
+#' \code{na_only} performs two actions at once: (1) it applies the filter only in
+#' the positions where the original value is \code{NA} and (2) for the rest of
+#' the cells, it is replaced with the value of the original matrix.
 #'
 #' @export
 #'
@@ -167,7 +189,7 @@ convolutionMedian <- function(X, kernel, times = 1){
 #' image(myOutput1, zlim = c(0, 100), title = "meanFilter")
 #' image(myOutput2, zlim = c(0, 100), title = "quantileFilter")
 #' image(myOutput3, zlim = c(0, 100), title = "medianFilter")
-meanFilter <- function(X, radius, times = 1){
+meanFilter <- function(X, radius, times = 1, na_only = FALSE){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X,
@@ -180,7 +202,10 @@ meanFilter <- function(X, radius, times = 1){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs, engine3_meanFilter(data = output, radius = radius))
+    output <- with(checkedArgs,
+                   engine3_meanFilter(data = output,
+                                      radius = radius,
+                                      na_only = isTRUE(na_only)))
   }
 
   output
@@ -191,7 +216,7 @@ meanFilter <- function(X, radius, times = 1){
 #' @return \code{quantileFilter} don't use a kernel but, for each cell, it
 #' returns the position of quantile 'probs' (value between 0 and 1).
 #' @export
-quantileFilter <- function(X, radius, probs, times = 1){
+quantileFilter <- function(X, radius, probs, times = 1, na_only = FALSE){
 
   # Check and validation of arguments
   checkedArgs <- list(X = X,
@@ -207,7 +232,10 @@ quantileFilter <- function(X, radius, probs, times = 1){
     gc(reset = TRUE)
 
     output <- with(checkedArgs,
-                   engine4_quantileFilter(data = output, radius = radius, probs = probs))
+                   engine4_quantileFilter(data = output,
+                                          radius = radius,
+                                          probs = probs,
+                                          na_only = isTRUE(na_only)))
   }
 
   output
@@ -218,9 +246,13 @@ quantileFilter <- function(X, radius, probs, times = 1){
 #' @return \code{medianFilter} is a wrapper of \code{quantileFilter} with
 #' \code{probs = 0.5}.
 #' @export
-medianFilter <- function(X, radius, times = 1){
+medianFilter <- function(X, radius, times = 1, na_only = FALSE){
 
-  quantileFilter(X = X, radius = radius, probs = 0.5, times = times)
+  quantileFilter(X = X,
+                 radius = radius,
+                 probs = 0.5,
+                 times = times,
+                 na_only = na_only)
 }
 
 
