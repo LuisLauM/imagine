@@ -1,3 +1,7 @@
+# imagine 2.1.1
+
+* Adding the `na_only` argument in several functions allowing to apply the filters only in the cells where there is `NA` and replacing with the original value in the rest.
+
 # imagine 2.0.0
 
 * Added a `NEWS.md` file to track changes to the package.

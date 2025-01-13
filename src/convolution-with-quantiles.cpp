@@ -14,7 +14,7 @@ using namespace Rcpp;
 
 // ENGINE 2: Convolution with quantiles
 // [[Rcpp::export]]
-NumericMatrix engine2_convWithQuantiles(arma::mat data, arma::mat kernel, arma::vec probs){
+NumericMatrix engine2_convWithQuantiles(arma::mat data, arma::mat kernel, arma::vec probs, bool na_only){
 
   // Get dimension of input matrix
   int nrows = data.n_rows;
@@ -44,6 +44,13 @@ NumericMatrix engine2_convWithQuantiles(arma::mat data, arma::mat kernel, arma::
   // Loop along every cell of original matrix
   for(int j = knlColHalf; j < (ncols - knlcols); j++){
     for(int i = knlRowHalf; i < (nrows - knlrows); i++){
+
+      if(na_only){
+        if(!std::isnan(data(i, j))){
+          emptyData(i, j) = data(i, j);
+          continue;
+        }
+      }
 
       // Initialize NA counter
       int naCounter = 0;

@@ -5,8 +5,8 @@
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine1_2dConv <- function(data, kernel) {
-    .Call(`_imagine_engine1_2dConv`, data, kernel)
+engine1_2dConv <- function(data, kernel, na_only) {
+    .Call(`_imagine_engine1_2dConv`, data, kernel, na_only)
 }
 
 #' @importFrom Rcpp evalCpp
@@ -35,16 +35,16 @@ engine5_CMF <- function(data, i_size = 3L, o_size = 5L) {
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine2_convWithQuantiles <- function(data, kernel, probs) {
-    .Call(`_imagine_engine2_convWithQuantiles`, data, kernel, probs)
+engine2_convWithQuantiles <- function(data, kernel, probs, na_only) {
+    .Call(`_imagine_engine2_convWithQuantiles`, data, kernel, probs, na_only)
 }
 
 #' @importFrom Rcpp evalCpp
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine3_meanFilter <- function(data, radius) {
-    .Call(`_imagine_engine3_meanFilter`, data, radius)
+engine3_meanFilter <- function(data, radius, na_only) {
+    .Call(`_imagine_engine3_meanFilter`, data, radius, na_only)
 }
 
 #' @importFrom Rcpp evalCpp
@@ -52,7 +52,7 @@ engine3_meanFilter <- function(data, radius) {
 #' @useDynLib imagine, .registration = TRUE
 NULL
 
-engine4_quantileFilter <- function(data, radius, probs) {
-    .Call(`_imagine_engine4_quantileFilter`, data, radius, probs)
+engine4_quantileFilter <- function(data, radius, probs, na_only) {
+    .Call(`_imagine_engine4_quantileFilter`, data, radius, probs, na_only)
 }
 

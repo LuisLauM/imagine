@@ -6,11 +6,18 @@
 \alias{convolutionMedian}
 \title{Make convolution calculations from numeric matrix}
 \usage{
-convolution2D(X, kernel, times = 1, normalize = FALSE)
+convolution2D(X, kernel, times = 1, normalize = FALSE, na_only = FALSE)
 
-convolutionQuantile(X, kernel, probs, times = 1, normalize = FALSE)
+convolutionQuantile(
+  X,
+  kernel,
+  probs,
+  times = 1,
+  normalize = FALSE,
+  na_only = FALSE
+)
 
-convolutionMedian(X, kernel, times = 1)
+convolutionMedian(X, kernel, times = 1, na_only = FALSE)
 }
 \arguments{
 \item{X}{A numeric \code{matrix} object used for apply filters.}
@@ -21,6 +28,9 @@ convolutionMedian(X, kernel, times = 1)
 
 \item{normalize}{\code{logical} indicating if results will (or not) be
 normalized. See details.}
+
+\item{na_only}{\code{logical}, Do you want to apply the filter ONLY in cells
+with NA?}
 
 \item{probs}{\code{numeric} vector of probabilities with values in [0,1].}
 }
@@ -49,6 +59,10 @@ outwards to the extent of the convolution kernel.
 Through normalization, the output of each convolution window is scaled by
 dividing it by the sum of the absolute values of the kernel
 (\code{sum(abs(as.numeric(kernel)))}, disabled by default).
+
+\code{na_only} performs two actions at once: (1) it applies the filter only in
+the positions where the original value is \code{NA} and (2) for the rest of
+the cells, it is replaced with the value of the original matrix.
 }
 \examples{
 # Generate example matrix
