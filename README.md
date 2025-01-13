@@ -61,6 +61,11 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 ## Versions
 
+### v. 2.1.2
+
+-   Minor correction on `is_extreme` C++ function.
+-   Minor corrections on `contextualMF` documentation.
+
 ### v. 2.1.1
 
 -   Adding the `na_only` argument in several functions allowing to apply the filters only in the cells where there is `NA` and replacing with the original value in the rest.

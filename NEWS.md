@@ -1,3 +1,8 @@
+# imagine 2.1.2
+
+* Minor correction on `is_extreme` C++ function.
+* Minor corrections on `contextualMF` documentation.
+
 # imagine 2.1.1
 
 * Adding the `na_only` argument in several functions allowing to apply the filters only in the cells where there is `NA` and replacing with the original value in the rest.
