@@ -29,10 +29,9 @@ oceanographic fronts, it is recommended to see and use the functions of the
 \examples{
 data(wbImage)
 
-# Agenbag, gradient algorithm 1
-cmdOut <- agenbagFilters(X = wbImage, algorithm = 1)
+cmfOut <- contextualMF(X = wbImage)
 
-# image(cmdOut)
+# image(cmfOut)
 }
 \references{
 Belkin, I. M., & O'Reilly, J. E. (2009). An algorithm for oceanic

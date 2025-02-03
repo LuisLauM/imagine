@@ -19,8 +19,6 @@ int is_extreme(NumericMatrix in_mat, int direction){
   tempVector = tempVector * NA_REAL;
   int midPos = std::floor(side/2);
 
-  double cellVal = in_mat(midPos, midPos);
-
   switch(direction){
   // WE slice
   case 1:
@@ -42,7 +40,7 @@ int is_extreme(NumericMatrix in_mat, int direction){
     // NE-SW slice
   case 4:
     for(int i = 0; i < side; i++){
-      tempVector[i] = in_mat(i, side - i);
+      tempVector[i] = in_mat(i, side - i - 1);
     }
     break;
   default:
@@ -57,6 +55,7 @@ int is_extreme(NumericMatrix in_mat, int direction){
   double minElement = min(tempVector);
 
   // If some min or max was found, increase the counter
+  double cellVal = in_mat(midPos, midPos);
   int out = (cellVal <= minElement) || (cellVal >= maxElement);
 
   return out;

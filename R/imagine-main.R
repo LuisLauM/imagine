@@ -284,10 +284,9 @@ medianFilter <- function(X, radius, times = 1, na_only = FALSE){
 #' @examples
 #' data(wbImage)
 #'
-#' # Agenbag, gradient algorithm 1
-#' cmdOut <- agenbagFilters(X = wbImage, algorithm = 1)
+#' cmfOut <- contextualMF(X = wbImage)
 #'
-#' # image(cmdOut)
+#' # image(cmfOut)
 contextualMF <- function(X){
 
   # Check and validation of arguments
