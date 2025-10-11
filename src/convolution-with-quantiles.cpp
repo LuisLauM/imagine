@@ -82,7 +82,7 @@ NumericMatrix engine2_convWithQuantiles(arma::mat data, arma::mat kernel, arma::
         arma::mat quantVal = arma::quantile(miniMatrix2.elem(arma::find_finite(miniMatrix2)), probs);
 
         // Replace the quantile value in the corresponding cell of the output matrix
-        emptyData(i, j) = arma::conv_to < double >::from(quantVal);
+        emptyData(i, j) = arma::as_scalar(quantVal);
       }
     }
   }

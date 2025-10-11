@@ -97,7 +97,7 @@ NumericMatrix engine7_agenbag2(arma::mat data, int threshold = 3){
 
         arma::mat quantVal = arma::stddev(miniMatrix2.elem(arma::find_finite(miniMatrix2)), 0, 0);
 
-        emptyData(i, j) = arma::conv_to < double >::from(quantVal);
+        emptyData(i, j) = arma::as_scalar(quantVal);
       }
     }
   }

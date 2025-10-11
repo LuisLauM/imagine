@@ -64,7 +64,7 @@ NumericMatrix engine4_quantileFilter(arma::mat data, NumericVector radius, arma:
 
         arma::mat quantVal = arma::quantile(miniMatrix2.elem(arma::find_finite(miniMatrix2)), probs);
 
-        emptyData(i, j) = arma::conv_to < double >::from(quantVal);
+        emptyData(i, j) = arma::as_scalar(quantVal);
       }
     }
   }
