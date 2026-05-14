@@ -1,0 +1,301 @@
+---
+title: "Introduction to imagine package"
+vignette: >
+  %\VignetteIndexEntry{Introduction to imagine package}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(imagine)
+```
+
+# IMAGing engINE: Tools for Application of Image Filters to Data Matrices
+
+The **imagine** package streamlines the application of image-filtering algorithms to numeric data matrices. It implements efficient median-filtering and 2D convolution routines in C++ via Rcpp, enabling fast processing of large datasets.
+
+
+## Installation
+
+For installing **imagine**, as follows:
+
+```{r}
+#| eval: false
+install.packages("imagine")
+```
+
+## Engines
+
+The **imagine** package relies on C++-based algorithms, referred to as engines, implemented using the Rcpp and RcppArmadillo packages to accelerate filtering operations. These engines provide substantial performance improvements when working with large matrices.
+
+As of version 2.1.0, the following engines are available:
+
+* Engine 1: Standard 2D convolution (kernel applied to each cell neighborhood and summed).
+* Engine 2: Same as Engine 1, but returns a quantile defined by the `probs` argument.
+* Engine 3: Computes the mean over a square neighborhood defined by `radius` argument.
+* Engine 4: Same as Engine 3, but returns a quantile defined by `probs` argument.
+* Engine 5: Contextual Median Filter described in [Belkin and O'Reilly (2009)](http://dx.doi.org/10.1016/j.jmarsys.2008.11.018).
+* Engines 6 and 7: Gradient filters described in [Agenbag et al. (2003)](https://doi.org/10.1016/j.pocean.2003.07.004).
+
+Since version 2.0.0, the radius argument can accept two values, allowing rectangular (non-square) neighborhoods.
+
+## Main functions
+
+The package provides five main functions and two wrappers.
+
+### Convolution functions
+```{r}
+#| eval: false
+
+# Build kernels
+# Kernel 1: For bottom edge recognition
+kernel1 <- matrix(
+  data = c(-1, -2, -1, 
+            0,  0,  0,
+            1,  2,  1), 
+  nrow = 3
+)
+
+# Kernel 2: Diagonal weighting
+kernel2 <- matrix(
+  data = c(-2, 0, 0,
+            0, 1, 0,
+            0, 0, 2), 
+  nrow = 3
+)
+
+# Apply filters
+convolutionExample  <- convolution2D(X = wbImage, kernel = kernel1)
+convQuantileExample <- convolutionQuantile(X = wbImage, kernel = kernel2, probs = 0.1)
+```
+
+To compare results, we plot the filtered outputs using the `image` function (@fig-2d-quantile-conv).
+
+**Original vs filtered outputs**
+
+```{r}
+#| message: false
+#| label: fig-2d-quantile-conv
+#| fig-width: 5.33
+#| fig-height: 8.5
+#| fig-cap: "2D vs 2D quantile convolutions"
+#| fig-pos: "h"
+#| results: hide
+#| echo: false
+
+# Defining a copy of wbImage
+myMatrix <- wbImage
+
+# Defining color palette
+cols <- gray.colors(n = 1e3, start = 0, end = 1)
+
+# Build kernels
+# Kernel 1: For bottom edge recognition
+kernel1 <- matrix(
+  data = c(-1, -2, -1,
+            0,  0,  0,
+            1,  2,  1), 
+  nrow = 3
+)
+
+# Kernel 2: Diagonal weighting 
+kernel2 <- matrix(
+  data = c(-2, 0, 0,
+            0, 1, 0,
+            0, 0, 2), 
+  nrow = 3
+)
+
+# Apply filters
+convolutionExample  <- convolution2D(X = myMatrix, kernel = kernel1)
+convQuantileExample <- convolutionQuantile(
+  X = myMatrix, 
+  kernel = kernel2, 
+  probs = 0.8
+)
+
+# Make plots
+par(
+  mar = c(0, 0.5, 0, 0.5), 
+  oma = c(0, 0, 2, 0), 
+  mfrow = c(3, 1)
+)
+
+image(wbImage, col = cols, axes = FALSE)
+mtext(text = "Original", side = 3, line = -1.5, font = 2, adj = 0.99)
+
+image(convolutionExample, col = cols, axes = FALSE)
+mtext(
+  text = "2D convolution", 
+  side = 3, 
+  line = -1.5, 
+  col = "white", 
+  font = 2, 
+  adj = 0.99
+)
+
+image(convQuantileExample, col = cols, axes = FALSE)
+mtext(
+  text = "2D quantile convolution", 
+  side = 3, 
+  line = -1.5, 
+  col = "black", 
+  font = 2, 
+  adj = 0.99
+)
+```
+
+
+### Median-filter asociated functions
+```{r}
+#| eval: false
+
+# Add some noise (NA) to the image (matrix)
+set.seed(7)
+naIndex <- sample(
+  x = seq(prod(dim(myMatrix))), 
+  size = as.integer(0.4*prod(dim(myMatrix))), 
+  replace = FALSE
+)
+myMatrix[naIndex] <- NA
+
+# Build kernel
+radius <- 3
+
+# Apply filters
+meanfilterExample     <- meanFilter(X = myMatrix, radius = radius)
+quantilefilterExample <- quantileFilter(X = myMatrix, radius = radius, probs = 0.1)
+medianfilterExample   <- medianFilter(X = myMatrix, radius = radius)
+```
+
+We now compare the original and filtered matrices (@fig-basic-filter-comparison).
+
+**Original and Filtered**
+
+```{r}
+#| message: false
+#| label: fig-basic-filter-comparison
+#| fig-width: 7.5
+#| fig-height: 5
+#| fig-cap: "Basic filters comparison"
+#| fig-pos: "h"
+#| results: hide
+#| echo: false
+
+# Defining a copy of wbImage
+myMatrix <- wbImage
+
+# Defining color palette
+cols <- gray.colors(n = 1e3, start = 0, end = 1)
+
+# Add some noise (NA) to the image (matrix)
+set.seed(7)
+naIndex <- sample(
+  x = seq(prod(dim(myMatrix))), 
+  size = as.integer(0.4*prod(dim(myMatrix)))
+)
+myMatrix[naIndex] <- NA
+
+# Apply filters
+meanfilterExample   <- meanFilter(X = myMatrix, radius = 3)
+medianfilterExample <- medianFilter(X = myMatrix, radius = 3)
+
+# Make plots
+par(mar = rep(0, 4), oma = rep(0.5, 4), mfrow = c(2, 2))
+
+image(wbImage, col = cols, axes = FALSE)
+mtext(text = "Original", side = 3, line = -1.5, font = 2, adj = 0.99)
+
+image(myMatrix, col = cols, axes = FALSE)
+mtext(
+  text = "Original with noise (NA)", 
+  side = 3, 
+  line = -1.5, 
+  font = 2, 
+  adj = 0.99
+)
+
+# meanfilterExample[meanfilterExample < 0] <- 0
+image(meanfilterExample, col = cols, axes = FALSE)
+mtext(
+  text = "Mean filter", 
+  side = 3, 
+  line = -1.5, 
+  font = 2, 
+  adj = 0.99
+)
+
+# medianfilterExample[medianfilterExample < 0] <- 0
+image(medianfilterExample, col = cols, axes = FALSE)
+mtext(
+  text = "2D median filter", 
+  side = 3, 
+  line = -1.5, 
+  font = 2, 
+  adj = 0.99
+)
+```
+
+## Kernel application
+
+In image processing, convolution is one of the most widely used operations. It consists of combining two arrays: the image (a matrix) and a kernel (a smaller matrix), which weights each pixel based on its neighborhood. Different kernels produce different effects, such as smoothing, shifting, or edge detection. Users should be cautious with kernel size, as larger neighborhoods reduce the number of valid pixels near the edges. All functions in **imagine** support recursive application through the times argument (@fig-recursive-filtering).
+
+```{r}
+#| eval: false
+
+medianFilter(X = wbImage, radius = 5, times = 50)
+```
+
+
+```{r}
+#| message: false
+#| label: fig-recursive-filtering
+#| fig-width: 7.5
+#| fig-height: 5
+#| fig-cap: "Filters with several time settings"
+#| fig-pos: "h"
+#| results: hide
+#| echo: false
+
+times <- c(1, 5, 15)
+
+# Defining color palette
+cols <- gray.colors(n = 1e3, start = 0, end = 1)
+
+# Apply filters
+median_times1 <- medianFilter(X = wbImage, radius = 5, times = times[1])
+median_times2 <- medianFilter(X = wbImage, radius = 5, times = times[2])
+median_times3 <- medianFilter(X = wbImage, radius = 5, times = times[3])
+
+# Make plots
+par(mar = rep(0, 4), oma = rep(0.5, 4), mfrow = c(2, 2))
+
+image(wbImage, col = cols, axes = FALSE)
+mtext(text = "Original", side = 3, line = -1.5, font = 2, adj = 0.99)
+
+image(median_times1, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[1]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
+
+image(median_times2, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[2]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
+
+image(median_times3, col = cols, axes = FALSE)
+mtext(text = paste("2D median filter\ntimes =", times[3]), 
+      side = 3, line = -2.5, font = 2, adj = 0.99)
+```
+
+## Filters based on published articles
+
+Since version 2.1.0, **imagine** includes implementations of algorithms from the literature for detecting oceanographic gradients:
+
+* contextualMF: Based on [Belkin and O'Reilly (2009)](https://doi.org/10.1016/j.jmarsys.2008.11.018).
+* agenbagFilters: Based on [Agenbag et al. (2003)](https://doi.org/10.1016/j.pocean.2003.07.004).
+
+Although both functions are available directly in **imagine**, their use is recommended through the [grec](https://cran.r-project.org/package=grec) package for more specialized workflows.

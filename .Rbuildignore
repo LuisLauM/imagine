@@ -3,3 +3,7 @@
 ^.*\.yml$
 ^doc$
 ^Meta$
+^vignettes/\.quarto$
+^vignettes/*_files$
+^README\.md$
+^README\.Rmd$

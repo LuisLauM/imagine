@@ -75,10 +75,14 @@ convolution2D <- function(X, kernel, times = 1, normalize = FALSE, na_only = FAL
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs,
-                   engine1_2dConv(data = output,
-                                  kernel = kernel,
-                                  na_only = isTRUE(na_only)))
+    output <- with(
+      checkedArgs,
+      engine1_2dConv(
+        data = output,
+        kernel = kernel,
+        na_only = isTRUE(na_only)
+      )
+    )
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
@@ -103,11 +107,15 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE, 
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs,
-                   engine2_convWithQuantiles(data = output,
-                                             kernel = kernel,
-                                             probs = probs,
-                                             na_only = isTRUE(na_only)))
+    output <- with(
+      checkedArgs,
+      engine2_convWithQuantiles(
+        data = output,
+        kernel = kernel,
+        probs = probs,
+        na_only = isTRUE(na_only)
+      )
+    )
 
     if(normalize){
       output <- output/sum(abs(as.numeric(kernel)), na.rm = TRUE)
@@ -124,11 +132,13 @@ convolutionQuantile <- function(X, kernel, probs, times = 1, normalize = FALSE, 
 #' @export
 convolutionMedian <- function(X, kernel, times = 1, na_only = FALSE){
 
-  convolutionQuantile(X = X,
-                      kernel = kernel,
-                      probs = 0.5,
-                      times = times,
-                      na_only = isTRUE(na_only))
+  convolutionQuantile(
+    X = X,
+    kernel = kernel,
+    probs = 0.5,
+    times = times,
+    na_only = isTRUE(na_only)
+  )
 }
 
 
@@ -202,10 +212,14 @@ meanFilter <- function(X, radius, times = 1, na_only = FALSE){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs,
-                   engine3_meanFilter(data = output,
-                                      radius = radius,
-                                      na_only = isTRUE(na_only)))
+    output <- with(
+      checkedArgs,
+      engine3_meanFilter(
+        data = output,
+        radius = radius,
+        na_only = isTRUE(na_only)
+      )
+    )
   }
 
   output
@@ -231,11 +245,15 @@ quantileFilter <- function(X, radius, probs, times = 1, na_only = FALSE){
   for(i in seq(checkedArgs$times)){
     gc(reset = TRUE)
 
-    output <- with(checkedArgs,
-                   engine4_quantileFilter(data = output,
-                                          radius = radius,
-                                          probs = probs,
-                                          na_only = isTRUE(na_only)))
+    output <- with(
+      checkedArgs,
+      engine4_quantileFilter(
+        data = output,
+        radius = radius,
+        probs = probs,
+        na_only = isTRUE(na_only)
+      )
+    )
   }
 
   output
@@ -248,11 +266,13 @@ quantileFilter <- function(X, radius, probs, times = 1, na_only = FALSE){
 #' @export
 medianFilter <- function(X, radius, times = 1, na_only = FALSE){
 
-  quantileFilter(X = X,
-                 radius = radius,
-                 probs = 0.5,
-                 times = times,
-                 na_only = na_only)
+  quantileFilter(
+    X = X,
+    radius = radius,
+    probs = 0.5,
+    times = times,
+    na_only = na_only
+  )
 }
 
 
@@ -364,7 +384,9 @@ agenbagFilters <- function(X, algorithm = c(1, 2), ...){
                       algorithm = algorithm)
   checkedArgs <- checkArgs(imagineArgs = checkedArgs, type = "agenbagFilters")
 
-  switch(checkedArgs$algorithm,
-         "1" = engine6_agenbag1(data = checkedArgs$X),
-         "2" = engine7_agenbag2(data = checkedArgs$X, ...))
+  switch(
+    checkedArgs$algorithm,
+    "1" = engine6_agenbag1(data = checkedArgs$X),
+    "2" = engine7_agenbag2(data = checkedArgs$X, ...)
+  )
 }

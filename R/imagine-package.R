@@ -7,5 +7,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom cli cli_abort
+#' @importFrom cli cli_warn
 ## usethis namespace: end
 NULL

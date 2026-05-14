@@ -22,7 +22,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Wencheng Lau-Medrano \email{luis.laum@gmail.com}
+\strong{Maintainer}: Wencheng Lau-Medrano \email{luis.laum@protonmail.com}
+
+Authors:
+\itemize{
+  \item Wencheng Lau-Medrano \email{luis.laum@protonmail.com}
+}
 
 }
 \keyword{internal}

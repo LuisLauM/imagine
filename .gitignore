@@ -67,3 +67,4 @@ vignettes/*.pdf
 inst/doc
 /doc/
 /Meta/
+**/.quarto/

@@ -1,3 +1,8 @@
+# imagine 2.1.4
+
+-   Subtle improvements to the code.
+-   imagine now uses the [cli](https://cli.r-lib.org/) package's syntax for messages.
+
 # imagine 2.1.2
 
 * Minor correction on `is_extreme` C++ function.

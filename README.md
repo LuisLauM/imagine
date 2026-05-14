@@ -61,6 +61,11 @@ mtext(text = "Filtered", side = 2, line = 0.5, font = 2)
 
 ## Versions
 
+### v. 2.1.4
+
+-   Subtle improvements to the code.
+-   imagine now uses the [cli](https://cli.r-lib.org/) package's syntax for messages.
+
 ### v. 2.1.2
 
 -   Minor correction on `is_extreme` C++ function.
